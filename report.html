@@ -1,0 +1,1226 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+    .reports-page {
+        padding: 10px 0 40px;
+    }
+
+    .reports-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+        margin-bottom: 25px;
+    }
+
+    .reports-header h1 {
+        margin: 0;
+        font-size: 28px;
+        font-weight: 700;
+    }
+
+    .reports-header p {
+        margin: 7px 0 0;
+        opacity: .65;
+    }
+
+    .report-actions {
+        display: flex;
+        gap: 10px;
+    }
+
+    .report-btn {
+        border: 1px solid rgba(255,255,255,.12);
+        background: rgba(255,255,255,.05);
+        color: inherit;
+        padding: 10px 16px;
+        border-radius: 10px;
+        cursor: pointer;
+        font-weight: 600;
+    }
+
+    .report-btn:hover {
+        background: rgba(255,255,255,.1);
+    }
+
+    .report-filter {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 22px;
+        padding: 16px 18px;
+        border-radius: 14px;
+        background: rgba(255,255,255,.04);
+        border: 1px solid rgba(255,255,255,.08);
+    }
+
+    .report-filter label {
+        font-weight: 600;
+    }
+
+    .report-filter input {
+        background: rgba(0,0,0,.18);
+        color: inherit;
+        border: 1px solid rgba(255,255,255,.12);
+        padding: 9px 12px;
+        border-radius: 8px;
+    }
+
+    .report-kpis {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 18px;
+        margin-bottom: 22px;
+    }
+
+    .report-kpi {
+        padding: 20px;
+        border-radius: 16px;
+        background: rgba(255,255,255,.045);
+        border: 1px solid rgba(255,255,255,.08);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .report-kpi .kpi-label {
+        font-size: 13px;
+        opacity: .65;
+        margin-bottom: 10px;
+    }
+
+    .report-kpi .kpi-value {
+        font-size: 30px;
+        font-weight: 800;
+    }
+
+    .report-kpi .kpi-small {
+        margin-top: 7px;
+        font-size: 12px;
+        opacity: .55;
+    }
+
+    .analytics-grid {
+        display: grid;
+        grid-template-columns: 1.25fr .75fr;
+        gap: 20px;
+        margin-bottom: 20px;
+    }
+
+    .analytics-card {
+        padding: 22px;
+        border-radius: 16px;
+        background: rgba(255,255,255,.045);
+        border: 1px solid rgba(255,255,255,.08);
+    }
+
+    .analytics-card h3 {
+        margin: 0 0 5px;
+        font-size: 18px;
+    }
+
+    .analytics-card .card-subtitle {
+        font-size: 12px;
+        opacity: .55;
+        margin-bottom: 20px;
+    }
+
+    /* Overall percentage */
+    .overall-section {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 260px;
+    }
+
+    .circle-wrap {
+        width: 190px;
+        height: 190px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        background:
+            conic-gradient(
+                currentColor var(--percentage, 0%),
+                rgba(255,255,255,.08) var(--percentage, 0%)
+            );
+        position: relative;
+    }
+
+    .circle-wrap::before {
+        content: "";
+        position: absolute;
+        width: 145px;
+        height: 145px;
+        border-radius: 50%;
+        background: var(--card-bg, #101827);
+    }
+
+    .circle-content {
+        position: relative;
+        text-align: center;
+        z-index: 2;
+    }
+
+    .circle-content strong {
+        display: block;
+        font-size: 36px;
+        font-weight: 800;
+    }
+
+    .circle-content span {
+        font-size: 12px;
+        opacity: .6;
+    }
+
+    /* Status chart */
+    .status-chart {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 260px;
+    }
+
+    .status-donut {
+        width: 175px;
+        height: 175px;
+        border-radius: 50%;
+        background:
+            conic-gradient(
+                #22c55e var(--present-angle, 0deg),
+                #ef4444 var(--present-angle, 0deg)
+            );
+        position: relative;
+    }
+
+    .status-donut::after {
+        content: "";
+        position: absolute;
+        inset: 35px;
+        border-radius: 50%;
+        background: var(--card-bg, #101827);
+    }
+
+    .status-center {
+        position: absolute;
+        inset: 0;
+        z-index: 3;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: 22px;
+    }
+
+    .status-legend {
+        margin-left: 25px;
+    }
+
+    .legend-row {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        margin: 12px 0;
+        font-size: 13px;
+    }
+
+    .legend-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+    }
+
+    .present-dot {
+        background: #22c55e;
+    }
+
+    .absent-dot {
+        background: #ef4444;
+    }
+
+    /* Bars */
+    .bar-list {
+        display: flex;
+        flex-direction: column;
+        gap: 17px;
+    }
+
+    .bar-item {
+        width: 100%;
+    }
+
+    .bar-top {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 7px;
+        font-size: 13px;
+    }
+
+    .bar-name {
+        font-weight: 600;
+    }
+
+    .bar-value {
+        opacity: .7;
+    }
+
+    .bar-track {
+        height: 9px;
+        border-radius: 20px;
+        background: rgba(255,255,255,.08);
+        overflow: hidden;
+    }
+
+    .bar-fill {
+        height: 100%;
+        width: 0;
+        border-radius: inherit;
+        transition: width .5s ease;
+        background: currentColor;
+    }
+
+    .trend-area {
+        width: 100%;
+        min-height: 270px;
+        display: flex;
+        align-items: flex-end;
+        gap: 10px;
+        padding: 20px 5px 5px;
+        box-sizing: border-box;
+    }
+
+    .trend-column {
+        flex: 1;
+        min-width: 25px;
+        height: 220px;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 7px;
+    }
+
+    .trend-value {
+        font-size: 10px;
+        opacity: .65;
+    }
+
+    .trend-bar {
+        width: 100%;
+        max-width: 42px;
+        min-height: 3px;
+        border-radius: 8px 8px 3px 3px;
+        background: currentColor;
+    }
+
+    .trend-label {
+        font-size: 10px;
+        opacity: .55;
+        white-space: nowrap;
+    }
+
+    /* Student performance */
+    .performance-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .performance-table th,
+    .performance-table td {
+        padding: 13px 10px;
+        border-bottom: 1px solid rgba(255,255,255,.07);
+        text-align: left;
+        font-size: 13px;
+    }
+
+    .performance-table th {
+        opacity: .55;
+        font-weight: 600;
+    }
+
+    .student-progress {
+        width: 120px;
+        height: 7px;
+        background: rgba(255,255,255,.08);
+        border-radius: 10px;
+        overflow: hidden;
+        display: inline-block;
+        vertical-align: middle;
+        margin-right: 7px;
+    }
+
+    .student-progress span {
+        display: block;
+        height: 100%;
+        width: 0;
+        background: currentColor;
+        border-radius: inherit;
+    }
+
+    .percentage-text {
+        font-weight: 700;
+    }
+
+    .empty-report {
+        text-align: center;
+        padding: 45px 20px;
+        opacity: .55;
+    }
+
+    /* Hidden raw data */
+    #reportRawData {
+        display: none;
+    }
+
+    @media (max-width: 1000px) {
+        .report-kpis {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .analytics-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 650px) {
+        .reports-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .report-kpis {
+            grid-template-columns: 1fr;
+        }
+
+        .report-filter {
+            flex-wrap: wrap;
+        }
+
+        .status-chart {
+            flex-direction: column;
+        }
+
+        .status-legend {
+            margin: 20px 0 0;
+        }
+    }
+
+    @media print {
+        .report-actions,
+        .report-filter,
+        nav,
+        aside,
+        .sidebar {
+            display: none !important;
+        }
+
+        .reports-page {
+            padding: 0;
+        }
+
+        .analytics-card,
+        .report-kpi {
+            break-inside: avoid;
+        }
+    }
+</style>
+
+<div class="reports-page">
+
+```
+<!-- HEADER -->
+<div class="reports-header">
+    <div>
+        <h1>Attendance Reports</h1>
+        <p>Analytics, student performance and attendance insights</p>
+    </div>
+
+    <div class="report-actions">
+        <button class="report-btn" onclick="window.print()">
+            🖨 Print Report
+        </button>
+    </div>
+</div>
+
+<!-- FILTER -->
+<div class="report-filter">
+    <label for="reportDate">Report Date:</label>
+    <input type="date"
+           id="reportDate"
+           value="{{ current_date if current_date else '' }}">
+    <button class="report-btn" onclick="resetReportDate()">
+        Reset
+    </button>
+</div>
+
+<!-- KPI CARDS -->
+<div class="report-kpis">
+
+    <div class="report-kpi">
+        <div class="kpi-label">TOTAL ATTENDANCE RECORDS</div>
+        <div class="kpi-value" id="totalRecords">0</div>
+        <div class="kpi-small">Database attendance records</div>
+    </div>
+
+    <div class="report-kpi">
+        <div class="kpi-label">PRESENT</div>
+        <div class="kpi-value" id="presentRecords">0</div>
+        <div class="kpi-small">Successfully attended</div>
+    </div>
+
+    <div class="report-kpi">
+        <div class="kpi-label">ABSENT</div>
+        <div class="kpi-value" id="absentRecords">0</div>
+        <div class="kpi-small">Attendance not completed</div>
+    </div>
+
+    <div class="report-kpi">
+        <div class="kpi-label">ATTENDANCE RATE</div>
+        <div class="kpi-value" id="attendanceRate">0%</div>
+        <div class="kpi-small">Overall performance</div>
+    </div>
+
+</div>
+
+<!-- TOP ANALYTICS -->
+<div class="analytics-grid">
+
+    <!-- OVERALL -->
+    <div class="analytics-card">
+        <h3>Overall Attendance</h3>
+        <div class="card-subtitle">
+            Combined attendance performance
+        </div>
+
+        <div class="overall-section">
+            <div class="circle-wrap" id="overallCircle">
+                <div class="circle-content">
+                    <strong id="overallPercentage">0%</strong>
+                    <span>Attendance</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- STATUS -->
+    <div class="analytics-card">
+        <h3>Attendance Distribution</h3>
+        <div class="card-subtitle">
+            Present vs absent records
+        </div>
+
+        <div class="status-chart">
+
+            <div class="status-donut" id="statusDonut">
+                <div class="status-center" id="statusCenter">
+                    0%
+                </div>
+            </div>
+
+            <div class="status-legend">
+                <div class="legend-row">
+                    <span class="legend-dot present-dot"></span>
+                    <span>Present:</span>
+                    <strong id="legendPresent">0</strong>
+                </div>
+
+                <div class="legend-row">
+                    <span class="legend-dot absent-dot"></span>
+                    <span>Absent:</span>
+                    <strong id="legendAbsent">0</strong>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<!-- TREND + LECTURE ANALYSIS -->
+<div class="analytics-grid">
+
+    <div class="analytics-card">
+        <h3>Attendance Trend</h3>
+        <div class="card-subtitle">
+            Attendance percentage by date
+        </div>
+
+        <div id="trendArea" class="trend-area">
+            <div class="empty-report">
+                No attendance trend available.
+            </div>
+        </div>
+    </div>
+
+    <div class="analytics-card">
+        <h3>Lecture-wise Attendance</h3>
+        <div class="card-subtitle">
+            Performance across lectures
+        </div>
+
+        <div id="lectureBars" class="bar-list">
+            <div class="empty-report">
+                No lecture data available.
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- STUDENT PERFORMANCE -->
+<div class="analytics-card" style="margin-bottom:20px;">
+    <h3>Student Performance</h3>
+    <div class="card-subtitle">
+        Attendance percentage calculated from available attendance records
+    </div>
+
+    <div style="overflow-x:auto;">
+        <table class="performance-table">
+            <thead>
+                <tr>
+                    <th>Student</th>
+                    <th>Roll No</th>
+                    <th>Total</th>
+                    <th>Present</th>
+                    <th>Absent</th>
+                    <th>Attendance</th>
+                </tr>
+            </thead>
+
+            <tbody id="studentPerformanceBody">
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- LOW ATTENDANCE -->
+<div class="analytics-grid">
+
+    <div class="analytics-card">
+        <h3>🏆 Best Attendance</h3>
+        <div class="card-subtitle">
+            Students with highest attendance
+        </div>
+
+        <div id="bestStudents" class="bar-list">
+            <div class="empty-report">
+                No data available.
+            </div>
+        </div>
+    </div>
+
+    <div class="analytics-card">
+        <h3>⚠ Attendance Needs Attention</h3>
+        <div class="card-subtitle">
+            Students with comparatively low attendance
+        </div>
+
+        <div id="lowStudents" class="bar-list">
+            <div class="empty-report">
+                No data available.
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- RAW DATABASE DATA -->
+<div id="reportRawData">
+
+    {% if logs %}
+
+        {% for log in logs %}
+
+            <div class="report-record"
+                 data-name="{{ log.student_name if log.student_name is defined else log.name if log.name is defined else 'Unknown Student' }}"
+                 data-roll="{{ log.roll_no if log.roll_no is defined else log.student_id if log.student_id is defined else '-' }}"
+                 data-date="{{ log.date if log.date is defined else '' }}"
+                 data-status="{{ log.status if log.status is defined else '' }}"
+                 data-lecture="{{ log.lecture_name if log.lecture_name is defined else log.lecture if log.lecture is defined else 'Attendance' }}">
+            </div>
+
+        {% endfor %}
+
+    {% endif %}
+
+</div>
+```
+
+</div>
+
+<script>
+(function () {
+
+    "use strict";
+
+    const records = [];
+
+    document.querySelectorAll(".report-record").forEach(function (row) {
+
+        records.push({
+            name: row.dataset.name || "Unknown Student",
+            roll: row.dataset.roll || "-",
+            date: row.dataset.date || "",
+            status: (row.dataset.status || "").toLowerCase(),
+            lecture: row.dataset.lecture || "Attendance"
+        });
+
+    });
+
+    function isPresent(status) {
+        return (
+            status === "present" ||
+            status === "verified" ||
+            status === "completed"
+        );
+    }
+
+    function isAbsent(status) {
+        return (
+            status === "absent" ||
+            status === "not verified"
+        );
+    }
+
+    function calculateData(data) {
+
+        let present = 0;
+        let absent = 0;
+
+        data.forEach(function (record) {
+
+            if (isPresent(record.status)) {
+                present++;
+            } else if (isAbsent(record.status)) {
+                absent++;
+            }
+
+        });
+
+        const total = present + absent;
+
+        const rate = total > 0
+            ? Math.round((present / total) * 100)
+            : 0;
+
+        return {
+            present: present,
+            absent: absent,
+            total: total,
+            rate: rate
+        };
+    }
+
+    function updateKPIs(data) {
+
+        const stats = calculateData(data);
+
+        document.getElementById("totalRecords").textContent =
+            stats.total;
+
+        document.getElementById("presentRecords").textContent =
+            stats.present;
+
+        document.getElementById("absentRecords").textContent =
+            stats.absent;
+
+        document.getElementById("attendanceRate").textContent =
+            stats.rate + "%";
+
+        document.getElementById("overallPercentage").textContent =
+            stats.rate + "%";
+
+        const circle = document.getElementById("overallCircle");
+
+        circle.style.setProperty(
+            "--percentage",
+            stats.rate + "%"
+        );
+
+        document.getElementById("legendPresent").textContent =
+            stats.present;
+
+        document.getElementById("legendAbsent").textContent =
+            stats.absent;
+
+        document.getElementById("statusCenter").textContent =
+            stats.rate + "%";
+
+        const angle = (stats.rate / 100) * 360;
+
+        document.getElementById("statusDonut")
+            .style.setProperty(
+                "--present-angle",
+                angle + "deg"
+            );
+    }
+
+    function buildStudents(data) {
+
+        const map = {};
+
+        data.forEach(function (record) {
+
+            const key = record.roll + "|" + record.name;
+
+            if (!map[key]) {
+                map[key] = {
+                    name: record.name,
+                    roll: record.roll,
+                    total: 0,
+                    present: 0,
+                    absent: 0
+                };
+            }
+
+            if (isPresent(record.status)) {
+                map[key].present++;
+                map[key].total++;
+            }
+            else if (isAbsent(record.status)) {
+                map[key].absent++;
+                map[key].total++;
+            }
+
+        });
+
+        return Object.values(map);
+    }
+
+    function renderStudentPerformance(data) {
+
+        const body =
+            document.getElementById("studentPerformanceBody");
+
+        body.innerHTML = "";
+
+        const students = buildStudents(data);
+
+        students.sort(function (a, b) {
+
+            const pa = a.total
+                ? a.present / a.total
+                : 0;
+
+            const pb = b.total
+                ? b.present / b.total
+                : 0;
+
+            return pb - pa;
+
+        });
+
+        if (!students.length) {
+
+            body.innerHTML =
+                '<tr><td colspan="6" class="empty-report">No attendance data available.</td></tr>';
+
+            return;
+        }
+
+        students.forEach(function (student) {
+
+            const percentage =
+                student.total > 0
+                    ? Math.round(
+                        (student.present / student.total) * 100
+                    )
+                    : 0;
+
+            const tr = document.createElement("tr");
+
+            tr.innerHTML = `
+                <td><strong>${escapeHTML(student.name)}</strong></td>
+                <td>${escapeHTML(student.roll)}</td>
+                <td>${student.total}</td>
+                <td>${student.present}</td>
+                <td>${student.absent}</td>
+                <td>
+                    <span class="student-progress">
+                        <span style="width:${percentage}%"></span>
+                    </span>
+                    <span class="percentage-text">
+                        ${percentage}%
+                    </span>
+                </td>
+            `;
+
+            body.appendChild(tr);
+
+        });
+
+        return students;
+    }
+
+    function renderBestAndLow(students) {
+
+        const best =
+            document.getElementById("bestStudents");
+
+        const low =
+            document.getElementById("lowStudents");
+
+        best.innerHTML = "";
+        low.innerHTML = "";
+
+        if (!students || !students.length) {
+
+            best.innerHTML =
+                '<div class="empty-report">No data available.</div>';
+
+            low.innerHTML =
+                '<div class="empty-report">No data available.</div>';
+
+            return;
+        }
+
+        const calculated = students.map(function (student) {
+
+            return {
+                ...student,
+                percentage: student.total
+                    ? Math.round(
+                        (student.present / student.total) * 100
+                    )
+                    : 0
+            };
+
+        });
+
+        const bestStudents =
+            [...calculated]
+                .sort((a, b) => b.percentage - a.percentage)
+                .slice(0, 5);
+
+        const lowStudents =
+            [...calculated]
+                .sort((a, b) => a.percentage - b.percentage)
+                .slice(0, 5);
+
+        bestStudents.forEach(function (student) {
+
+            best.innerHTML += `
+                <div class="bar-item">
+                    <div class="bar-top">
+                        <span class="bar-name">
+                            ${escapeHTML(student.name)}
+                        </span>
+                        <span class="bar-value">
+                            ${student.percentage}%
+                        </span>
+                    </div>
+
+                    <div class="bar-track">
+                        <div class="bar-fill"
+                             style="width:${student.percentage}%">
+                        </div>
+                    </div>
+                </div>
+            `;
+
+        });
+
+        lowStudents.forEach(function (student) {
+
+            low.innerHTML += `
+                <div class="bar-item">
+                    <div class="bar-top">
+                        <span class="bar-name">
+                            ${escapeHTML(student.name)}
+                        </span>
+                        <span class="bar-value">
+                            ${student.percentage}%
+                        </span>
+                    </div>
+
+                    <div class="bar-track">
+                        <div class="bar-fill"
+                             style="width:${student.percentage}%">
+                        </div>
+                    </div>
+                </div>
+            `;
+
+        });
+
+    }
+
+    function renderLectures(data) {
+
+        const container =
+            document.getElementById("lectureBars");
+
+        container.innerHTML = "";
+
+        const map = {};
+
+        data.forEach(function (record) {
+
+            const lecture =
+                record.lecture || "Attendance";
+
+            if (!map[lecture]) {
+                map[lecture] = {
+                    present: 0,
+                    absent: 0
+                };
+            }
+
+            if (isPresent(record.status)) {
+                map[lecture].present++;
+            }
+            else if (isAbsent(record.status)) {
+                map[lecture].absent++;
+            }
+
+        });
+
+        const lectures =
+            Object.entries(map);
+
+        if (!lectures.length) {
+
+            container.innerHTML =
+                '<div class="empty-report">No lecture data available.</div>';
+
+            return;
+        }
+
+        lectures
+            .sort(function (a, b) {
+
+                const totalA =
+                    a[1].present + a[1].absent;
+
+                const totalB =
+                    b[1].present + b[1].absent;
+
+                const rateA =
+                    totalA
+                        ? a[1].present / totalA
+                        : 0;
+
+                const rateB =
+                    totalB
+                        ? b[1].present / totalB
+                        : 0;
+
+                return rateB - rateA;
+
+            })
+            .forEach(function (item) {
+
+                const lecture = item[0];
+                const values = item[1];
+
+                const total =
+                    values.present + values.absent;
+
+                const percentage =
+                    total
+                        ? Math.round(
+                            (values.present / total) * 100
+                        )
+                        : 0;
+
+                container.innerHTML += `
+                    <div class="bar-item">
+                        <div class="bar-top">
+                            <span class="bar-name">
+                                ${escapeHTML(lecture)}
+                            </span>
+
+                            <span class="bar-value">
+                                ${percentage}%
+                            </span>
+                        </div>
+
+                        <div class="bar-track">
+                            <div class="bar-fill"
+                                 style="width:${percentage}%">
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+            });
+
+    }
+
+    function renderTrend(data) {
+
+        const area =
+            document.getElementById("trendArea");
+
+        area.innerHTML = "";
+
+        const map = {};
+
+        data.forEach(function (record) {
+
+            if (!record.date) {
+                return;
+            }
+
+            if (!map[record.date]) {
+                map[record.date] = {
+                    present: 0,
+                    absent: 0
+                };
+            }
+
+            if (isPresent(record.status)) {
+                map[record.date].present++;
+            }
+            else if (isAbsent(record.status)) {
+                map[record.date].absent++;
+            }
+
+        });
+
+        const dates =
+            Object.keys(map).sort();
+
+        if (!dates.length) {
+
+            area.innerHTML =
+                '<div class="empty-report">No attendance trend available.</div>';
+
+            return;
+        }
+
+        const recent =
+            dates.slice(-12);
+
+        recent.forEach(function (date) {
+
+            const value = map[date];
+
+            const total =
+                value.present + value.absent;
+
+            const percentage =
+                total
+                    ? Math.round(
+                        (value.present / total) * 100
+                    )
+                    : 0;
+
+            const column =
+                document.createElement("div");
+
+            column.className =
+                "trend-column";
+
+            const label =
+                formatDate(date);
+
+            column.innerHTML = `
+                <div class="trend-value">
+                    ${percentage}%
+                </div>
+
+                <div class="trend-bar"
+                     style="height:${Math.max(percentage, 3)}%">
+                </div>
+
+                <div class="trend-label">
+                    ${escapeHTML(label)}
+                </div>
+            `;
+
+            area.appendChild(column);
+
+        });
+
+    }
+
+    function formatDate(dateString) {
+
+        if (!dateString) {
+            return "-";
+        }
+
+        const parts =
+            dateString.split("-");
+
+        if (parts.length === 3) {
+            return parts[2] + "/" + parts[1];
+        }
+
+        return dateString;
+    }
+
+    function escapeHTML(value) {
+
+        return String(value)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+
+    }
+
+    function renderReport(data) {
+
+        updateKPIs(data);
+
+        const students =
+            renderStudentPerformance(data) || [];
+
+        renderBestAndLow(students);
+
+        renderLectures(data);
+
+        renderTrend(data);
+
+    }
+
+    function filterByDate() {
+
+        const selected =
+            document.getElementById("reportDate").value;
+
+        if (!selected) {
+            renderReport(records);
+            return;
+        }
+
+        const filtered =
+            records.filter(function (record) {
+
+                return record.date === selected;
+
+            });
+
+        renderReport(filtered);
+
+    }
+
+    window.resetReportDate = function () {
+
+        const input =
+            document.getElementById("reportDate");
+
+        input.value = "";
+
+        renderReport(records);
+
+    };
+
+    document
+        .getElementById("reportDate")
+        .addEventListener(
+            "change",
+            filterByDate
+        );
+
+    renderReport(records);
+
+})();
+</script>
+
+{% endblock %}

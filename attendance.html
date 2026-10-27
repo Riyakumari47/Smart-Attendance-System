@@ -1,0 +1,1845 @@
+{% extends "base.html" %}
+
+{% block title %}Live Attendance{% endblock %}
+
+{% block content %}
+
+<style>
+.attendance-page {
+    padding: 24px;
+    color: #e8eefc;
+}
+
+.attendance-topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 24px;
+}
+
+.attendance-title-area h1 {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+.attendance-title-area p {
+    margin: 7px 0 0;
+    color: #8995ad;
+    font-size: 14px;
+}
+
+.system-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    padding: 10px 16px;
+    border-radius: 30px;
+    background: rgba(34,197,94,.08);
+    border: 1px solid rgba(34,197,94,.22);
+    color: #72e69a;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .5px;
+}
+
+.system-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #35d878;
+    box-shadow: 0 0 12px rgba(53,216,120,.8);
+}
+
+.attendance-card {
+    background:
+        linear-gradient(
+            145deg,
+            rgba(21,29,48,.98),
+            rgba(10,15,27,.98)
+        );
+    border: 1px solid rgba(105,130,180,.13);
+    border-radius: 18px;
+    box-shadow:
+        0 18px 45px rgba(0,0,0,.20),
+        inset 0 1px 0 rgba(255,255,255,.025);
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 22px;
+    border-bottom: 1px solid rgba(255,255,255,.055);
+}
+
+.card-title {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+}
+
+.card-title-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(67,126,255,.12);
+    color: #6e9cff;
+    font-size: 15px;
+}
+
+.card-title h2 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 650;
+}
+
+.card-title p {
+    margin: 4px 0 0;
+    color: #77839b;
+    font-size: 12px;
+}
+
+.lecture-card {
+    margin-bottom: 20px;
+}
+
+.lecture-body {
+    padding: 20px 22px;
+}
+
+.lecture-select-label {
+    display: block;
+    margin-bottom: 9px;
+    color: #aeb9cd;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.lecture-select {
+    width: 100%;
+    height: 48px;
+    padding: 0 15px;
+    border-radius: 11px;
+    border: 1px solid rgba(120,145,190,.18);
+    background: #0c1322;
+    color: #e8eefc;
+    outline: none;
+    font-size: 14px;
+}
+
+.lecture-select:focus {
+    border-color: rgba(72,132,255,.65);
+    box-shadow: 0 0 0 3px rgba(72,132,255,.09);
+}
+
+.lecture-select option {
+    background: #101827;
+    color: #fff;
+}
+
+.selected-lecture {
+    display: none;
+    grid-template-columns: 1.5fr 1fr 1fr;
+    gap: 12px;
+    margin-top: 15px;
+}
+
+.lecture-info-box {
+    padding: 14px 16px;
+    border-radius: 12px;
+    background: rgba(255,255,255,.025);
+    border: 1px solid rgba(255,255,255,.055);
+}
+
+.lecture-info-box span {
+    display: block;
+    color: #748097;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: .8px;
+    margin-bottom: 6px;
+}
+
+.lecture-info-box strong {
+    color: #eaf0ff;
+    font-size: 13px;
+}
+
+.attendance-stats {
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.stat-card {
+    position: relative;
+    overflow: hidden;
+    padding: 18px;
+    border-radius: 16px;
+    background:
+        linear-gradient(
+            145deg,
+            rgba(22,31,52,.98),
+            rgba(11,16,28,.98)
+        );
+    border: 1px solid rgba(105,130,180,.12);
+}
+
+.stat-content {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+}
+
+.stat-icon {
+    width: 43px;
+    height: 43px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(70,126,255,.11);
+    color: #73a0ff;
+}
+
+.stat-label {
+    display: block;
+    color: #77839a;
+    font-size: 11px;
+    margin-bottom: 5px;
+}
+
+.stat-value {
+    font-size: 21px;
+    font-weight: 700;
+    color: #edf3ff;
+}
+
+.attendance-main-grid {
+    display: grid;
+    grid-template-columns: minmax(0,1.45fr) minmax(300px,.75fr);
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.scanner-card {
+    overflow: hidden;
+}
+
+.camera-wrapper {
+    padding: 20px;
+}
+
+.camera-box {
+    position: relative;
+    width: 100%;
+    min-height: 420px;
+    overflow: hidden;
+    border-radius: 15px;
+    background:
+        radial-gradient(
+            circle at center,
+            #182640 0%,
+            #080d18 62%
+        );
+    border: 1px solid rgba(105,130,180,.16);
+}
+
+#attendanceCamera {
+    width: 100%;
+    height: 420px;
+    display: block;
+    object-fit: cover;
+    background: #070c15;
+    transform: scaleX(-1);
+}
+
+.camera-placeholder {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: #71809a;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.camera-placeholder i {
+    font-size: 42px;
+    margin-bottom: 14px;
+    color: #456083;
+}
+
+.camera-placeholder strong {
+    color: #aab6ca;
+    font-size: 14px;
+}
+
+.camera-placeholder span {
+    margin-top: 6px;
+    font-size: 11px;
+    color: #65728a;
+}
+
+.scan-frame {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 280px;
+    height: 310px;
+    transform: translate(-50%,-50%);
+    pointer-events: none;
+    z-index: 3;
+}
+
+.scan-corner {
+    position: absolute;
+    width: 38px;
+    height: 38px;
+    border-color: #5e92ff;
+    border-style: solid;
+    filter: drop-shadow(0 0 6px rgba(75,130,255,.45));
+}
+
+.scan-corner.tl {
+    top: 0;
+    left: 0;
+    border-width: 3px 0 0 3px;
+    border-radius: 9px 0 0 0;
+}
+
+.scan-corner.tr {
+    top: 0;
+    right: 0;
+    border-width: 3px 3px 0 0;
+    border-radius: 0 9px 0 0;
+}
+
+.scan-corner.bl {
+    bottom: 0;
+    left: 0;
+    border-width: 0 0 3px 3px;
+    border-radius: 0 0 0 9px;
+}
+
+.scan-corner.br {
+    bottom: 0;
+    right: 0;
+    border-width: 0 3px 3px 0;
+    border-radius: 0 0 9px 0;
+}
+
+.scan-line {
+    position: absolute;
+    left: 5px;
+    right: 5px;
+    top: 8px;
+    height: 2px;
+    background: #5f96ff;
+    box-shadow:
+        0 0 8px #5f96ff,
+        0 0 20px rgba(95,150,255,.7);
+    animation: scanMove 2.2s ease-in-out infinite;
+}
+
+@keyframes scanMove {
+    0%,100% {
+        top: 8px;
+        opacity: .4;
+    }
+
+    50% {
+        top: calc(100% - 10px);
+        opacity: 1;
+    }
+}
+
+.scanner-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 15px 20px 20px;
+}
+
+.scanner-message {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    color: #8490a6;
+    font-size: 12px;
+}
+
+.scanner-message i {
+    color: #6393ff;
+}
+
+.scanner-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.scan-btn {
+    border: 0;
+    border-radius: 9px;
+    padding: 10px 16px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 650;
+    transition: .2s ease;
+}
+
+.scan-btn.primary {
+    background: #356fe8;
+    color: white;
+}
+
+.scan-btn.primary:hover {
+    background: #447df0;
+    transform: translateY(-1px);
+}
+
+.scan-btn.danger {
+    background: rgba(239,68,68,.12);
+    border: 1px solid rgba(239,68,68,.22);
+    color: #ff8585;
+}
+
+.scan-btn:disabled {
+    opacity: .4;
+    cursor: not-allowed;
+}
+
+.student-card {
+    min-height: 100%;
+}
+
+.student-body {
+    padding: 20px;
+}
+
+.empty-student {
+    min-height: 390px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 25px;
+}
+
+.empty-student-icon {
+    width: 74px;
+    height: 74px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(74,127,255,.08);
+    border: 1px solid rgba(74,127,255,.13);
+    color: #587cb9;
+    font-size: 27px;
+    margin-bottom: 17px;
+}
+
+.empty-student h3 {
+    margin: 0;
+    color: #aebbd0;
+    font-size: 15px;
+}
+
+.empty-student p {
+    max-width: 270px;
+    margin: 9px 0 0;
+    color: #69758c;
+    font-size: 11px;
+    line-height: 1.6;
+}
+
+.active-student {
+    display: none;
+}
+
+.student-profile {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid rgba(255,255,255,.055);
+}
+
+.student-avatar {
+    width: 54px;
+    height: 54px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 15px;
+    background: linear-gradient(145deg,#356fe8,#244eae);
+    color: white;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.student-name {
+    margin: 0 0 4px;
+    color: #edf3ff;
+    font-size: 16px;
+}
+
+.student-uid {
+    margin: 0;
+    color: #748199;
+    font-size: 11px;
+}
+
+.confidence-box {
+    margin-top: 18px;
+    padding: 14px;
+    border-radius: 12px;
+    background: rgba(34,197,94,.055);
+    border: 1px solid rgba(34,197,94,.12);
+}
+
+.confidence-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.confidence-top span {
+    color: #7d8b9f;
+    font-size: 11px;
+}
+
+.confidence-top strong {
+    color: #62dc8d;
+    font-size: 14px;
+}
+
+.confidence-bar {
+    height: 5px;
+    margin-top: 10px;
+    overflow: hidden;
+    border-radius: 10px;
+    background: rgba(255,255,255,.07);
+}
+
+.confidence-fill {
+    width: 0;
+    height: 100%;
+    border-radius: inherit;
+    background: #36cf78;
+    transition: width .5s ease;
+}
+
+.duration-box {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 0;
+    border-bottom: 1px solid rgba(255,255,255,.055);
+}
+
+.duration-box span {
+    color: #77839a;
+    font-size: 11px;
+}
+
+.duration-box strong {
+    color: #edf3ff;
+    font-size: 17px;
+}
+
+.progress-section {
+    padding-top: 17px;
+}
+
+.progress-heading {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 9px;
+}
+
+.progress-heading span {
+    color: #77839a;
+    font-size: 11px;
+}
+
+.progress-heading strong {
+    color: #73a0ff;
+    font-size: 12px;
+}
+
+.progress-track {
+    height: 7px;
+    overflow: hidden;
+    border-radius: 10px;
+    background: rgba(255,255,255,.065);
+}
+
+.progress-fill {
+    width: 0;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg,#356fe8,#6c9cff);
+    transition: width .5s ease;
+}
+
+.activity-box {
+    margin-top: 18px;
+}
+
+.activity-title {
+    margin-bottom: 9px;
+    color: #8d9ab0;
+    font-size: 11px;
+    font-weight: 650;
+}
+
+.activity-log {
+    max-height: 120px;
+    overflow-y: auto;
+}
+
+.activity-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 0;
+    border-bottom: 1px solid rgba(255,255,255,.035);
+    color: #68758c;
+    font-size: 10px;
+}
+
+.activity-item i {
+    color: #55cf85;
+    font-size: 8px;
+}
+
+.timetable-card {
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+
+.timetable-wrapper {
+    overflow-x: auto;
+    padding: 0 20px 20px;
+}
+
+.timetable {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 6px;
+    min-width: 650px;
+}
+
+.timetable th {
+    padding: 12px 13px;
+    text-align: left;
+    color: #65728a;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .7px;
+}
+
+.timetable td {
+    padding: 12px 13px;
+    background: rgba(255,255,255,.022);
+    border-top: 1px solid rgba(255,255,255,.035);
+    border-bottom: 1px solid rgba(255,255,255,.035);
+    color: #aeb9cd;
+    font-size: 11px;
+}
+
+.timetable td:first-child {
+    border-left: 1px solid rgba(255,255,255,.035);
+    border-radius: 9px 0 0 9px;
+    color: #d7e1f4;
+    font-weight: 650;
+}
+
+.timetable td:last-child {
+    border-right: 1px solid rgba(255,255,255,.035);
+    border-radius: 0 9px 9px 0;
+}
+
+.timetable tr:hover td {
+    background: rgba(70,126,255,.055);
+}
+
+.time-cell {
+    color: #7f9fe3 !important;
+    font-weight: 600;
+}
+
+.lab-tag {
+    display: inline-block;
+    padding: 4px 8px;
+    margin-left: 5px;
+    border-radius: 5px;
+    background: rgba(139,92,246,.10);
+    color: #a98df2;
+    font-size: 9px;
+}
+
+.off-tag {
+    display: inline-block;
+    padding: 4px 9px;
+    border-radius: 6px;
+    background: rgba(255,255,255,.045);
+    color: #68748a;
+    font-size: 9px;
+}
+
+@media (max-width:1050px) {
+    .attendance-main-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .selected-lecture {
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+}
+
+@media (max-width:700px) {
+    .attendance-page {
+        padding: 15px;
+    }
+
+    .attendance-topbar {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .attendance-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .selected-lecture {
+        grid-template-columns: 1fr;
+    }
+
+    .camera-box,
+    #attendanceCamera {
+        min-height: 300px;
+        height: 300px;
+    }
+
+    .scanner-footer {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .scanner-buttons {
+        width: 100%;
+    }
+
+    .scan-btn {
+        flex: 1;
+    }
+}
+</style>
+
+
+<div class="attendance-page">
+
+    <!-- HEADER -->
+
+    <div class="attendance-topbar">
+
+        <div class="attendance-title-area">
+
+            <h1>Live Attendance</h1>
+
+            <p>
+                AI-powered face verification and real-time attendance tracking
+            </p>
+
+        </div>
+
+        <div
+            id="recognitionStatus"
+            class="system-status">
+
+            <span class="system-dot"></span>
+
+            <span class="status-text">
+                SYSTEM READY
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <!-- LECTURE -->
+
+    <div class="attendance-card lecture-card">
+
+        <div class="card-header">
+
+            <div class="card-title">
+
+                <div class="card-title-icon">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+
+                <div>
+
+                    <h2>Select Lecture</h2>
+
+                    <p>
+                        Choose the lecture for attendance verification
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="lecture-body">
+
+            <label
+                for="lectureSelect"
+                class="lecture-select-label">
+
+                Available Lectures
+
+            </label>
+
+
+            <select
+                id="lectureSelect"
+                class="lecture-select">
+
+                <option value="">
+                    Select a lecture
+                </option>
+
+                {% for lecture in lectures %}
+
+                <option
+                    value="{{ lecture.id }}"
+                    data-name="{{ lecture.lecture_name }}"
+                    data-start="{{ lecture.start_time }}"
+                    data-end="{{ lecture.end_time }}"
+                    data-required="{{ lecture.required_percentage }}">
+
+                    {{ lecture.lecture_name }}
+
+                    {% if lecture.start_time and lecture.end_time %}
+                        — {{ lecture.start_time }} - {{ lecture.end_time }}
+                    {% endif %}
+
+                </option>
+
+                {% endfor %}
+
+            </select>
+
+
+            <div
+                id="lectureDetails"
+                class="selected-lecture">
+
+                <div class="lecture-info-box">
+
+                    <span>Subject</span>
+
+                    <strong id="selectedLectureName">
+                        —
+                    </strong>
+
+                </div>
+
+                <div class="lecture-info-box">
+
+                    <span>Lecture Time</span>
+
+                    <strong id="selectedLectureTime">
+                        —
+                    </strong>
+
+                </div>
+
+                <div class="lecture-info-box">
+
+                    <span>Required Attendance</span>
+
+                    <strong id="selectedLectureRequirement">
+                        —
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- STATS -->
+
+    <div class="attendance-stats">
+
+        <div class="stat-card">
+
+            <div class="stat-content">
+
+                <div class="stat-icon">
+                    <i class="fas fa-user-check"></i>
+                </div>
+
+                <div>
+
+                    <span class="stat-label">
+                        Total Verified
+                    </span>
+
+                    <strong
+                        id="statTotalVerified"
+                        class="stat-value">
+                        0
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <div class="stat-content">
+
+                <div class="stat-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+
+                <div>
+
+                    <span class="stat-label">
+                        Attendance Progress
+                    </span>
+
+                    <strong
+                        id="statPresent"
+                        class="stat-value">
+                        0%
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <div class="stat-content">
+
+                <div class="stat-icon">
+                    <i class="fas fa-stopwatch"></i>
+                </div>
+
+                <div>
+
+                    <span class="stat-label">
+                        Required Duration
+                    </span>
+
+                    <strong
+                        id="requiredDuration"
+                        class="stat-value">
+                        00:00
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- CAMERA + STUDENT -->
+
+    <div class="attendance-main-grid">
+
+
+        <!-- CAMERA -->
+
+        <div class="attendance-card scanner-card">
+
+            <div class="card-header">
+
+                <div class="card-title">
+
+                    <div class="card-title-icon">
+                        <i class="fas fa-camera"></i>
+                    </div>
+
+                    <div>
+
+                        <h2>Live Face Scanner</h2>
+
+                        <p>
+                            Real-time AI face detection and verification
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="camera-wrapper">
+
+                <div class="camera-box">
+
+                    <video
+                        id="attendanceCamera"
+                        autoplay
+                        playsinline
+                        muted>
+                    </video>
+
+
+                    <canvas
+                        id="attendanceCanvas"
+                        style="display:none;">
+                    </canvas>
+
+
+                    <div
+                        id="attendancePlaceholder"
+                        class="camera-placeholder">
+
+                        <i class="fas fa-camera"></i>
+
+                        <strong>
+                            Camera Ready
+                        </strong>
+
+                        <span>
+                            Select a lecture to begin scanning
+                        </span>
+
+                    </div>
+
+
+                    <div class="scan-frame">
+
+                        <div class="scan-corner tl"></div>
+
+                        <div class="scan-corner tr"></div>
+
+                        <div class="scan-corner bl"></div>
+
+                        <div class="scan-corner br"></div>
+
+                        <div class="scan-line"></div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="scanner-footer">
+
+                <div
+                    id="attendanceMessage"
+                    class="scanner-message">
+
+                    <i class="fas fa-circle-info"></i>
+
+                    <span>
+                        Select a lecture to start face verification.
+                    </span>
+
+                </div>
+
+
+                <div class="scanner-buttons">
+
+                    <!--
+                        IMPORTANT:
+                        Direct onclick added here.
+                        This guarantees button click
+                        reaches app.js.
+                    -->
+
+                    <button
+                        type="button"
+                        id="startAttendanceBtn"
+                        class="scan-btn primary"
+                        disabled
+                        onclick="window.startAttendanceScanner()">
+
+                        <i class="fas fa-play"></i>
+
+                        Start Scanner
+
+                    </button>
+
+
+                    <button
+                        type="button"
+                        id="stopAttendanceBtn"
+                        class="scan-btn danger"
+                        style="display:none;"
+                        onclick="window.stopAttendanceScanner()">
+
+                        <i class="fas fa-stop"></i>
+
+                        Stop
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- VERIFIED STUDENT -->
+
+        <div class="attendance-card student-card">
+
+            <div class="card-header">
+
+                <div class="card-title">
+
+                    <div class="card-title-icon">
+                        <i class="fas fa-id-card"></i>
+                    </div>
+
+                    <div>
+
+                        <h2>Verified Student</h2>
+
+                        <p>
+                            Current face recognition result
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="student-body">
+
+
+                <div
+                    id="recognizedStudent"
+                    class="empty-student">
+
+                    <div class="empty-student-icon">
+                        <i class="fas fa-user-clock"></i>
+                    </div>
+
+                    <h3>
+                        Waiting for Verification
+                    </h3>
+
+                    <p>
+                        Start the scanner and position the student's
+                        face inside the scanning frame.
+                    </p>
+
+                </div>
+
+
+                <div
+                    id="recognizedInfo"
+                    class="active-student">
+
+                    <div class="student-profile">
+
+                        <div
+                            id="recognizedInitial"
+                            class="student-avatar">
+                            —
+                        </div>
+
+                        <div>
+
+                            <h3
+                                id="recognizedName"
+                                class="student-name">
+                                —
+                            </h3>
+
+                            <p class="student-uid">
+
+                                UID:
+
+                                <strong id="recognizedRoll">
+                                    —
+                                </strong>
+
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="confidence-box">
+
+                        <div class="confidence-top">
+
+                            <span>
+                                Recognition Confidence
+                            </span>
+
+                            <strong id="recognizedConfidence">
+                                0%
+                            </strong>
+
+                        </div>
+
+                        <div class="confidence-bar">
+
+                            <div
+                                id="confidenceFill"
+                                class="confidence-fill">
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="duration-box">
+
+                        <span>
+                            Verified Duration
+                        </span>
+
+                        <strong
+                            id="recognizedDuration"
+                            data-seconds="0">
+                            00:00
+                        </strong>
+
+                    </div>
+
+
+                    <div class="progress-section">
+
+                        <div class="progress-heading">
+
+                            <span>
+                                Attendance Progress
+                            </span>
+
+                            <strong id="progressPercentage">
+                                0%
+                            </strong>
+
+                        </div>
+
+                        <div class="progress-track">
+
+                            <div
+                                id="studentProgress"
+                                class="progress-fill">
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="activity-box">
+
+                        <div class="activity-title">
+                            Verification Activity
+                        </div>
+
+                        <div
+                            id="activityLog"
+                            class="activity-log">
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- WEEKLY TIMETABLE -->
+
+    <div class="attendance-card timetable-card">
+
+        <div class="card-header">
+
+            <div class="card-title">
+
+                <div class="card-title-icon">
+                    <i class="fas fa-calendar-week"></i>
+                </div>
+
+                <div>
+
+                    <h2>Weekly Timetable</h2>
+
+                    <p>
+                        Scheduled classes and practical sessions
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="timetable-wrapper">
+
+            <table class="timetable">
+
+                <thead>
+
+                    <tr>
+
+                        <th>Day</th>
+                        <th>Time</th>
+                        <th>Subject</th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+
+                    <!-- MONDAY -->
+
+                    <tr>
+
+                        <td>
+                            Monday
+                        </td>
+
+                        <td colspan="2">
+
+                            <span class="off-tag">
+                                OFF DAY
+                            </span>
+
+                        </td>
+
+                    </tr>
+
+
+                    <!-- TUESDAY -->
+
+                    <tr>
+
+                        <td rowspan="5">
+                            Tuesday
+                        </td>
+
+                        <td class="time-cell">
+                            11:25 - 12:10
+                        </td>
+
+                        <td>
+                            Data Mining
+                        </td>
+
+                    </tr>
+
+                    <tr>
+
+                        <td class="time-cell">
+                            12:10 - 12:55
+                        </td>
+
+                        <td>
+                            Software Engineering
+                        </td>
+
+                    </tr>
+
+                    <tr>
+
+                        <td class="time-cell">
+                            13:40 - 14:25
+                        </td>
+
+                        <td>
+                            Minor Project
+                        </td>
+
+                    </tr>
+
+                    <tr>
+
+                        <td class="time-cell">
+                            14:25 - 15:10
+                        </td>
+
+                        <td>
+
+                            Python Lab
+
+                            <span class="lab-tag">
+                                LAB
+                            </span>
+
+                        </td>
+
+                    </tr>
+
+                    <tr>
+
+                        <td class="time-cell">
+                            15:10 - 15:55
+                        </td>
+
+                        <td>
+
+                            Python Lab
+
+                            <span class="lab-tag">
+                                LAB
+                            </span>
+
+                        </td>
+
+                    </tr>
+
+
+                    <!-- WEDNESDAY -->
+
+                    <tr>
+
+                        <td rowspan="6">
+                            Wednesday
+                        </td>
+
+                        <td class="time-cell">
+                            10:40 - 11:25
+                        </td>
+
+                        <td>
+                            Data Mining
+                        </td>
+
+                    </tr>
+
+                    <tr>
+
+                        <td class="time-cell">
+                            11:25 - 12:10
+                        </td>
+
+                        <td>
+                            Software Engineering
+                        </td>
+
+                    </tr>
+
+                    <tr>
+
+                        <td class="time-cell">
+                            12:55 - 13:40
+                        </td>
+
+                        <td>
+                            Python
+                        </td>
+
+                    </tr>
+
+                    <tr>
+
+                        <td class="time-cell">
+                            13:40 - 14:25
+                        </td>
+
+                        <td>
+                            Minor Project
+                        </td>
+
+                    </tr>
+
+                    <tr>
+
+                        <td class="time-cell">
+                            14:25 - 15:10
+                        </td>
+
+                        <td>
+
+                            Data Mining Lab
+
+                            <span class="lab-tag">
+                                LAB
+                            </span>
+
+                        </td>
+
+                    </tr>
+
+                    <tr>
+
+                        <td class="time-cell">
+                            15:10 - 15:55
+                        </td>
+
+                        <td>
+
+                            Data Mining Lab
+
+                            <span class="lab-tag">
+                                LAB
+                            </span>
+
+                        </td>
+
+                    </tr>
+
+
+                    <!-- THURSDAY -->
+
+                    <tr>
+
+                        <td rowspan="2">
+                            Thursday
+                        </td>
+
+                        <td class="time-cell">
+                            09:55 - 10:40
+                        </td>
+
+                        <td>
+                            Python
+                        </td>
+
+                    </tr>
+
+                    <tr>
+
+                        <td class="time-cell">
+                            12:55 - 14:25
+                        </td>
+
+                        <td>
+
+                            Python Lab
+
+                            <span class="lab-tag">
+                                LAB
+                            </span>
+
+                        </td>
+
+                    </tr>
+
+
+                    <!-- FRIDAY -->
+
+                    <tr>
+
+                        <td rowspan="6">
+                            Friday
+                        </td>
+
+                        <td class="time-cell">
+                            09:55 - 10:40
+                        </td>
+
+                        <td>
+                            Data Mining
+                        </td>
+
+                    </tr>
+
+                    <tr>
+
+                        <td class="time-cell">
+                            10:40 - 11:25
+                        </td>
+
+                        <td>
+                            Leadership &amp; Time Management
+                        </td>
+
+                    </tr>
+
+                    <tr>
+
+                        <td class="time-cell">
+                            11:25 - 12:10
+                        </td>
+
+                        <td>
+                            Software Engineering
+                        </td>
+
+                    </tr>
+
+                    <tr>
+
+                        <td class="time-cell">
+                            12:10 - 12:55
+                        </td>
+
+                        <td>
+                            Entrepreneurship
+                        </td>
+
+                    </tr>
+
+                    <tr>
+
+                        <td class="time-cell">
+                            14:25 - 15:10
+                        </td>
+
+                        <td>
+
+                            Data Mining Lab
+
+                            <span class="lab-tag">
+                                LAB
+                            </span>
+
+                        </td>
+
+                    </tr>
+
+                    <tr>
+
+                        <td class="time-cell">
+                            15:10 - 15:55
+                        </td>
+
+                        <td>
+
+                            Data Mining Lab
+
+                            <span class="lab-tag">
+                                LAB
+                            </span>
+
+                        </td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     LECTURE SELECTION
+========================================================= -->
+
+<script>
+
+(function () {
+
+    const lectureSelect =
+        document.getElementById("lectureSelect");
+
+    const lectureDetails =
+        document.getElementById("lectureDetails");
+
+    const selectedLectureName =
+        document.getElementById("selectedLectureName");
+
+    const selectedLectureTime =
+        document.getElementById("selectedLectureTime");
+
+    const selectedLectureRequirement =
+        document.getElementById("selectedLectureRequirement");
+
+    const startButton =
+        document.getElementById("startAttendanceBtn");
+
+    const attendanceMessage =
+        document.getElementById("attendanceMessage");
+
+
+    if (!lectureSelect) {
+        return;
+    }
+
+
+    lectureSelect.addEventListener(
+        "change",
+        async function () {
+
+            const option =
+                lectureSelect.options[
+                    lectureSelect.selectedIndex
+                ];
+
+
+            if (!lectureSelect.value) {
+
+                lectureDetails.style.display =
+                    "none";
+
+                startButton.disabled =
+                    true;
+
+                attendanceMessage.innerHTML =
+                    '<i class="fas fa-circle-info"></i>' +
+                    '<span>' +
+                    'Select a lecture to start face verification.' +
+                    '</span>';
+
+                window.SELECTED_ATTENDANCE_LECTURE =
+                    null;
+
+                return;
+            }
+
+
+            const lecture = {
+
+                id:
+                    option.value,
+
+                name:
+                    option.getAttribute(
+                        "data-name"
+                    ) || "",
+
+                start_time:
+                    option.getAttribute(
+                        "data-start"
+                    ) || "",
+
+                end_time:
+                    option.getAttribute(
+                        "data-end"
+                    ) || "",
+
+                required_percentage:
+                    option.getAttribute(
+                        "data-required"
+                    ) || "90"
+
+            };
+
+
+            window.SELECTED_ATTENDANCE_LECTURE =
+                lecture;
+
+
+            selectedLectureName.textContent =
+                lecture.name || "—";
+
+
+            selectedLectureTime.textContent =
+                lecture.start_time &&
+                lecture.end_time
+
+                    ? lecture.start_time +
+                      " - " +
+                      lecture.end_time
+
+                    : "Scheduled Lecture";
+
+
+            selectedLectureRequirement.textContent =
+                lecture.required_percentage + "%";
+
+
+            lectureDetails.style.display =
+                "grid";
+
+
+            /*
+             * ENABLE BUTTON
+             */
+            startButton.disabled =
+                false;
+
+
+            attendanceMessage.innerHTML =
+                '<i class="fas fa-spinner fa-spin"></i>' +
+                '<span>Preparing camera for ' +
+                lecture.name +
+                '...</span>';
+
+
+            /*
+             * Store lecture for app.js
+             */
+            if (
+                window.STATE &&
+                window.STATE.attendance
+            ) {
+
+                window.STATE.lecture =
+                    lecture;
+
+            }
+
+
+            /*
+             * Automatically start scanner
+             */
+            if (
+                typeof window.startAttendanceFromLectureSelection ===
+                "function"
+            ) {
+
+                await window.startAttendanceFromLectureSelection(
+                    lecture
+                );
+
+            }
+
+        }
+    );
+
+})();
+
+</script>
+
+{% endblock %}

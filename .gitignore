@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+*.db
+*.pkl
+data/faces/
+data/model/
+data/trainer
+static/faces/
+venv/
+.venv/
+.env

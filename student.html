@@ -1,0 +1,210 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="history-dashboard">
+
+```
+<div class="dashboard-header">
+    <div class="header-title">
+        <h1>Student Management</h1>
+        <p class="subtitle">Manage registered students and face-recognition profiles</p>
+    </div>
+
+    <div class="header-actions">
+        <a href="{{ url_for('add_student') }}" class="btn btn-primary">
+            + Add Student
+        </a>
+    </div>
+</div>
+
+
+<div class="card filter-card">
+    <div class="filter-grid">
+
+        <div class="search-input-wrapper">
+            <span class="search-icon">🔍</span>
+            <input
+                type="text"
+                id="studentSearch"
+                placeholder="Search by name, UID or roll number..."
+            >
+        </div>
+
+    </div>
+</div>
+
+
+<div class="card table-card">
+
+    <div class="table-responsive">
+
+        <table class="modern-table" id="studentsTable">
+
+            <thead>
+                <tr>
+                    <th>UID</th>
+                    <th>Student Name</th>
+                    <th>Roll No</th>
+                    <th>Registered</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <tbody id="studentsTableBody">
+
+            {% if students %}
+
+                {% for student in students %}
+
+                <tr
+                    class="student-row"
+                    data-name="{{ student.name or '' }}"
+                    data-uid="{{ student.student_id or '' }}"
+                    data-roll="{{ student.roll_no or '' }}"
+                >
+
+                    <td>
+                        <span class="roll-tag">
+                            {{ student.student_id or '--' }}
+                        </span>
+                    </td>
+
+                    <td>
+                        <div class="student-profile-cell">
+
+                            <div class="mini-avatar">
+                                {{ (student.name or 'S')[0]|upper }}
+                            </div>
+
+                            <span class="student-name">
+                                {{ student.name or 'Unknown Student' }}
+                            </span>
+
+                        </div>
+                    </td>
+
+                    <td>
+                        {{ student.roll_no or student.student_id or '--' }}
+                    </td>
+
+                    <td>
+                        {{ student.created_at or '--' }}
+                    </td>
+
+                    <td>
+
+                        <div style="display:flex; gap:8px;">
+
+                            <a
+                                href="{{ url_for('edit_student', student_id=student.student_id) }}"
+                                class="btn btn-secondary"
+                            >
+                                Edit
+                            </a>
+
+                            <form
+                                method="POST"
+                                action="{{ url_for('delete_student', student_id=student.student_id) }}"
+                                onsubmit="return confirm('Delete this student?');"
+                                style="display:inline;"
+                            >
+                                <button
+                                    type="submit"
+                                    class="btn btn-danger"
+                                >
+                                    Delete
+                                </button>
+                            </form>
+
+                        </div>
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            {% else %}
+
+                <tr>
+
+                    <td colspan="5" style="text-align:center; padding:45px;">
+
+                        <div style="font-size:42px;">👨‍🎓</div>
+
+                        <strong>No students registered yet</strong>
+
+                        <p style="opacity:.7; margin-top:8px;">
+                            Click "Add Student" to register a student
+                            and capture their face.
+                        </p>
+
+                    </td>
+
+                </tr>
+
+            {% endif %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+```
+
+</div>
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const search =
+        document.getElementById("studentSearch");
+
+    const rows =
+        document.querySelectorAll(".student-row");
+
+
+    if (!search) return;
+
+
+    search.addEventListener("input", function () {
+
+        const value =
+            this.value.trim().toLowerCase();
+
+
+        rows.forEach(function (row) {
+
+            const name =
+                (row.dataset.name || "").toLowerCase();
+
+            const uid =
+                (row.dataset.uid || "").toLowerCase();
+
+            const roll =
+                (row.dataset.roll || "").toLowerCase();
+
+
+            if (
+                name.includes(value) ||
+                uid.includes(value) ||
+                roll.includes(value)
+            ) {
+                row.style.display = "";
+            } else {
+                row.style.display = "none";
+            }
+
+        });
+
+    });
+
+});
+
+</script>
+
+{% endblock %}

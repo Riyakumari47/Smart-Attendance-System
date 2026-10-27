@@ -1,0 +1,714 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+    .history-page {
+        padding: 8px 0 40px;
+    }
+
+    .history-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+        margin-bottom: 24px;
+    }
+
+    .history-header h1 {
+        margin: 0;
+        font-size: 28px;
+        font-weight: 750;
+    }
+
+    .history-header p {
+        margin: 7px 0 0;
+        opacity: .58;
+        font-size: 13px;
+    }
+
+    .history-actions {
+        display: flex;
+        gap: 10px;
+    }
+
+    .history-btn {
+        border: 1px solid rgba(255,255,255,.10);
+        background: rgba(255,255,255,.05);
+        color: inherit;
+        padding: 10px 15px;
+        border-radius: 10px;
+        cursor: pointer;
+        font-weight: 650;
+    }
+
+    .history-btn:hover {
+        background: rgba(255,255,255,.10);
+    }
+
+    .history-stats {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    .history-stat {
+        padding: 18px;
+        border-radius: 15px;
+        background: rgba(255,255,255,.04);
+        border: 1px solid rgba(255,255,255,.08);
+    }
+
+    .history-stat-label {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+        opacity: .48;
+    }
+
+    .history-stat-value {
+        font-size: 28px;
+        font-weight: 800;
+        margin-top: 6px;
+    }
+
+    .filter-panel {
+        display: grid;
+        grid-template-columns: 1.5fr 1fr 1fr;
+        gap: 12px;
+        padding: 16px;
+        margin-bottom: 20px;
+        border-radius: 15px;
+        background: rgba(255,255,255,.035);
+        border: 1px solid rgba(255,255,255,.08);
+    }
+
+    .history-input,
+    .history-select {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 11px 13px;
+        border-radius: 9px;
+        border: 1px solid rgba(255,255,255,.10);
+        background: rgba(0,0,0,.15);
+        color: inherit;
+        outline: none;
+    }
+
+    .history-input:focus,
+    .history-select:focus {
+        border-color: rgba(59,130,246,.55);
+    }
+
+    .history-card {
+        border-radius: 16px;
+        overflow: hidden;
+        background: rgba(255,255,255,.035);
+        border: 1px solid rgba(255,255,255,.08);
+    }
+
+    .history-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 18px 20px;
+        border-bottom: 1px solid rgba(255,255,255,.07);
+    }
+
+    .history-card-header h2 {
+        margin: 0;
+        font-size: 17px;
+    }
+
+    .record-count {
+        font-size: 11px;
+        opacity: .5;
+    }
+
+    .history-table-wrap {
+        overflow-x: auto;
+    }
+
+    .history-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .history-table th,
+    .history-table td {
+        padding: 14px 17px;
+        text-align: left;
+        border-bottom: 1px solid rgba(255,255,255,.055);
+        font-size: 13px;
+        white-space: nowrap;
+    }
+
+    .history-table th {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: .04em;
+        opacity: .48;
+    }
+
+    .history-table tr:last-child td {
+        border-bottom: 0;
+    }
+
+    .student-cell {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .student-avatar {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(59,130,246,.15);
+        color: #60a5fa;
+        font-weight: 800;
+    }
+
+    .student-info strong {
+        display: block;
+        font-size: 13px;
+    }
+
+    .student-info span {
+        display: block;
+        font-size: 10px;
+        opacity: .45;
+        margin-top: 2px;
+    }
+
+    .roll-chip {
+        padding: 5px 8px;
+        border-radius: 7px;
+        background: rgba(255,255,255,.06);
+        font-size: 11px;
+    }
+
+    .date-chip {
+        font-size: 12px;
+        opacity: .72;
+    }
+
+    .duration-chip {
+        font-size: 11px;
+        padding: 5px 8px;
+        border-radius: 7px;
+        background: rgba(255,255,255,.05);
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 6px 10px;
+        border-radius: 20px;
+        font-size: 10px;
+        font-weight: 750;
+    }
+
+    .status-present {
+        background: rgba(34,197,94,.12);
+        color: #4ade80;
+    }
+
+    .status-absent {
+        background: rgba(239,68,68,.12);
+        color: #f87171;
+    }
+
+    .status-other {
+        background: rgba(234,179,8,.12);
+        color: #facc15;
+    }
+
+    .empty-history {
+        text-align: center;
+        padding: 65px 20px;
+        opacity: .5;
+    }
+
+    .empty-history-icon {
+        font-size: 40px;
+        margin-bottom: 12px;
+    }
+
+    .no-results {
+        display: none;
+        text-align: center;
+        padding: 45px 20px;
+        opacity: .5;
+    }
+
+    @media (max-width: 900px) {
+        .history-stats {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .filter-panel {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 600px) {
+        .history-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .history-stats {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media print {
+        .history-actions,
+        .filter-panel,
+        .sidebar,
+        aside,
+        nav {
+            display: none !important;
+        }
+    }
+</style>
+
+<div class="history-page">
+
+```
+<div class="history-header">
+
+    <div>
+        <h1>Attendance History</h1>
+        <p>Detailed record of face-verified attendance activity</p>
+    </div>
+
+    <div class="history-actions">
+        <button class="history-btn" onclick="window.print()">
+            🖨 Print
+        </button>
+    </div>
+
+</div>
+
+<div class="history-stats">
+
+    <div class="history-stat">
+        <div class="history-stat-label">Total Records</div>
+        <div class="history-stat-value" id="historyTotal">0</div>
+    </div>
+
+    <div class="history-stat">
+        <div class="history-stat-label">Present</div>
+        <div class="history-stat-value" id="historyPresent">0</div>
+    </div>
+
+    <div class="history-stat">
+        <div class="history-stat-label">Absent</div>
+        <div class="history-stat-value" id="historyAbsent">0</div>
+    </div>
+
+    <div class="history-stat">
+        <div class="history-stat-label">Attendance Rate</div>
+        <div class="history-stat-value" id="historyRate">0%</div>
+    </div>
+
+</div>
+
+<div class="filter-panel">
+
+    <input
+        type="text"
+        id="historySearch"
+        class="history-input"
+        placeholder="🔎 Search student, UID, roll number..."
+    >
+
+    <input
+        type="date"
+        id="historyDate"
+        class="history-input"
+    >
+
+    <select id="statusFilter" class="history-select">
+        <option value="all">All Statuses</option>
+        <option value="present">Present</option>
+        <option value="absent">Absent</option>
+    </select>
+
+</div>
+
+<div class="history-card">
+
+    <div class="history-card-header">
+        <h2>Attendance Activity</h2>
+        <span class="record-count" id="recordCount">
+            0 records
+        </span>
+    </div>
+
+    <div class="history-table-wrap">
+
+        <table class="history-table" id="historyTable">
+
+            <thead>
+                <tr>
+                    <th>Student</th>
+                    <th>UID / Roll No</th>
+                    <th>Date</th>
+                    <th>Check-In</th>
+                    <th>Tracked Time</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+
+            <tbody id="historyBody">
+
+            {% if logs %}
+
+                {% for log in logs %}
+
+                {% set student_name =
+                    log.student_name
+                    if log.student_name is defined
+                    else log.name
+                    if log.name is defined
+                    else 'Unknown Student'
+                %}
+
+                {% set roll =
+                    log.roll_no
+                    if log.roll_no is defined
+                    else log.student_id
+                    if log.student_id is defined
+                    else '-'
+                %}
+
+                {% set log_date =
+                    log.date
+                    if log.date is defined
+                    else ''
+                %}
+
+                {% set checkin =
+                    log.first_seen
+                    if log.first_seen is defined
+                    else log.check_in
+                    if log.check_in is defined
+                    else '--:--:--'
+                %}
+
+                {% set duration =
+                    log.verified_seconds
+                    if log.verified_seconds is defined
+                    else log.duration
+                    if log.duration is defined
+                    else 0
+                %}
+
+                {% set status =
+                    log.status
+                    if log.status is defined
+                    else 'Unknown'
+                %}
+
+                <tr
+                    class="history-row"
+                    data-name="{{ student_name }}"
+                    data-roll="{{ roll }}"
+                    data-date="{{ log_date }}"
+                    data-status="{{ status|lower }}"
+                >
+
+                    <td>
+                        <div class="student-cell">
+
+                            <div class="student-avatar">
+                                {{ student_name[0]|upper if student_name else '?' }}
+                            </div>
+
+                            <div class="student-info">
+                                <strong>{{ student_name }}</strong>
+                                <span>Face Recognition</span>
+                            </div>
+
+                        </div>
+                    </td>
+
+                    <td>
+                        <span class="roll-chip">
+                            {{ roll }}
+                        </span>
+                    </td>
+
+                    <td>
+                        <span class="date-chip">
+                            {{ log_date if log_date else '—' }}
+                        </span>
+                    </td>
+
+                    <td>
+                        {{ checkin if checkin else '—' }}
+                    </td>
+
+                    <td>
+                        <span class="duration-chip">
+                            {% if duration is number %}
+                                {% set mins = (duration // 60) %}
+                                {% set secs = (duration % 60) %}
+                                {{ "%02d:%02d"|format(mins, secs) }}
+                            {% else %}
+                                {{ duration }}
+                            {% endif %}
+                        </span>
+                    </td>
+
+                    <td>
+
+                        {% if status|lower in ['present', 'verified', 'completed'] %}
+
+                            <span class="status-badge status-present">
+                                ● Present
+                            </span>
+
+                        {% elif status|lower == 'absent' %}
+
+                            <span class="status-badge status-absent">
+                                ● Absent
+                            </span>
+
+                        {% else %}
+
+                            <span class="status-badge status-other">
+                                ● {{ status }}
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            {% endif %}
+
+            </tbody>
+
+        </table>
+
+        <div class="no-results" id="noResults">
+            No matching attendance records found.
+        </div>
+
+        {% if not logs %}
+
+        <div class="empty-history">
+            <div class="empty-history-icon">📋</div>
+            <strong>No attendance history yet</strong>
+            <p>Attendance records will appear here after face verification.</p>
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+```
+
+</div>
+
+<script>
+(function () {
+
+    "use strict";
+
+    const rows =
+        Array.from(
+            document.querySelectorAll(".history-row")
+        );
+
+    const search =
+        document.getElementById("historySearch");
+
+    const date =
+        document.getElementById("historyDate");
+
+    const status =
+        document.getElementById("statusFilter");
+
+    const total =
+        document.getElementById("historyTotal");
+
+    const present =
+        document.getElementById("historyPresent");
+
+    const absent =
+        document.getElementById("historyAbsent");
+
+    const rate =
+        document.getElementById("historyRate");
+
+    const count =
+        document.getElementById("recordCount");
+
+    const noResults =
+        document.getElementById("noResults");
+
+    function isPresent(value) {
+
+        return [
+            "present",
+            "verified",
+            "completed"
+        ].includes(value);
+
+    }
+
+    function isAbsent(value) {
+
+        return value === "absent";
+
+    }
+
+    function updateStats(visibleRows) {
+
+        let p = 0;
+        let a = 0;
+
+        visibleRows.forEach(function (row) {
+
+            const s =
+                row.dataset.status || "";
+
+            if (isPresent(s)) {
+                p++;
+            }
+
+            if (isAbsent(s)) {
+                a++;
+            }
+
+        });
+
+        const t = p + a;
+
+        const percentage =
+            t > 0
+                ? Math.round((p / t) * 100)
+                : 0;
+
+        total.textContent = t;
+        present.textContent = p;
+        absent.textContent = a;
+        rate.textContent = percentage + "%";
+
+    }
+
+    function applyFilters() {
+
+        const query =
+            search.value
+                .trim()
+                .toLowerCase();
+
+        const selectedDate =
+            date.value;
+
+        const selectedStatus =
+            status.value;
+
+        const visible = [];
+
+        rows.forEach(function (row) {
+
+            const name =
+                (row.dataset.name || "")
+                    .toLowerCase();
+
+            const roll =
+                (row.dataset.roll || "")
+                    .toLowerCase();
+
+            const rowDate =
+                row.dataset.date || "";
+
+            const rowStatus =
+                row.dataset.status || "";
+
+            const matchesSearch =
+                !query ||
+                name.includes(query) ||
+                roll.includes(query);
+
+            const matchesDate =
+                !selectedDate ||
+                rowDate === selectedDate;
+
+            const matchesStatus =
+                selectedStatus === "all" ||
+                (
+                    selectedStatus === "present" &&
+                    isPresent(rowStatus)
+                ) ||
+                (
+                    selectedStatus === "absent" &&
+                    isAbsent(rowStatus)
+                );
+
+            const show =
+                matchesSearch &&
+                matchesDate &&
+                matchesStatus;
+
+            row.style.display =
+                show ? "" : "none";
+
+            if (show) {
+                visible.push(row);
+            }
+
+        });
+
+        count.textContent =
+            visible.length +
+            (visible.length === 1
+                ? " record"
+                : " records");
+
+        updateStats(visible);
+
+        noResults.style.display =
+            visible.length === 0
+                ? "block"
+                : "none";
+
+    }
+
+    search.addEventListener(
+        "input",
+        applyFilters
+    );
+
+    date.addEventListener(
+        "change",
+        applyFilters
+    );
+
+    status.addEventListener(
+        "change",
+        applyFilters
+    );
+
+    applyFilters();
+
+})();
+</script>
+
+{% endblock %}

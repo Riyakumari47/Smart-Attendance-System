@@ -1,0 +1,2726 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Dashboard | Smart Attendance System</title>
+
+    <link rel="preconnect"
+          href="https://fonts.googleapis.com">
+
+    <link rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+          rel="stylesheet">
+
+    <style>
+
+        /* =====================================================
+           RESET
+        ===================================================== */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            width: 100%;
+            min-height: 100%;
+        }
+
+        body {
+            font-family: "Inter", sans-serif;
+            background: #061326;
+            color: #f5f7fb;
+            overflow-x: hidden;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+
+        /* =====================================================
+           APP LAYOUT
+        ===================================================== */
+
+        .app {
+            display: flex;
+            min-height: 100vh;
+            width: 100%;
+            background:
+                radial-gradient(
+                    circle at 75% 0%,
+                    rgba(20, 92, 180, 0.12),
+                    transparent 35%
+                ),
+                #061326;
+        }
+
+
+        /* =====================================================
+           SIDEBAR
+        ===================================================== */
+
+        .sidebar {
+            width: 250px;
+            min-width: 250px;
+            min-height: 100vh;
+
+            background:
+                linear-gradient(
+                    180deg,
+                    #091a32 0%,
+                    #07172c 55%,
+                    #061326 100%
+                );
+
+            border-right: 1px solid rgba(90, 140, 200, 0.18);
+
+            display: flex;
+            flex-direction: column;
+
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+
+            z-index: 100;
+        }
+
+
+        /* LOGO */
+
+        .brand {
+            height: 96px;
+            padding: 22px 20px;
+
+            display: flex;
+            align-items: center;
+            gap: 12px;
+
+            border-bottom: 1px solid rgba(90, 140, 200, 0.10);
+        }
+
+        .brand-icon {
+            width: 46px;
+            height: 46px;
+
+            border-radius: 12px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #1268f3,
+                    #0a3f9d
+                );
+
+            box-shadow:
+                0 8px 25px rgba(15, 91, 220, 0.28);
+
+            font-size: 23px;
+        }
+
+        .brand-text h2 {
+            font-size: 15px;
+            font-weight: 800;
+            letter-spacing: 0.4px;
+        }
+
+        .brand-text span {
+            display: block;
+            margin-top: 4px;
+
+            font-size: 11px;
+            color: #8da4c4;
+        }
+
+
+        /* NAVIGATION */
+
+        .nav {
+            padding: 28px 14px;
+        }
+
+        .nav-title {
+            padding: 0 13px 12px;
+
+            color: #61799c;
+
+            font-size: 10px;
+            font-weight: 700;
+
+            letter-spacing: 1.5px;
+        }
+
+        .nav-link {
+            height: 52px;
+
+            margin-bottom: 7px;
+
+            padding: 0 14px;
+
+            border-radius: 9px;
+
+            display: flex;
+            align-items: center;
+
+            gap: 13px;
+
+            color: #b9c8dc;
+
+            font-size: 13px;
+            font-weight: 600;
+
+            transition: 0.2s ease;
+        }
+
+        .nav-link:hover {
+            background: rgba(34, 109, 224, 0.12);
+            color: #ffffff;
+        }
+
+        .nav-link.active {
+            background:
+                linear-gradient(
+                    90deg,
+                    #125dd5,
+                    #0d4db9
+                );
+
+            color: #ffffff;
+
+            box-shadow:
+                0 8px 22px rgba(15, 85, 205, 0.25);
+        }
+
+        .nav-icon {
+            width: 25px;
+            text-align: center;
+            font-size: 19px;
+        }
+
+        .logout-link {
+            margin-top: 24px;
+            color: #ff6671;
+        }
+
+        .logout-link:hover {
+            background: rgba(255, 60, 75, 0.10);
+            color: #ff6671;
+        }
+
+
+        /* SIDEBAR BOTTOM */
+
+        .sidebar-bottom {
+            margin-top: auto;
+            padding: 18px 20px 25px;
+
+            border-top: 1px solid rgba(90, 140, 200, 0.10);
+        }
+
+        .ai-status {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+
+            color: #8ca5c4;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .ai-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #20d477;
+
+            box-shadow:
+                0 0 10px rgba(32, 212, 119, 0.8);
+        }
+
+
+        /* =====================================================
+           MAIN CONTENT
+        ===================================================== */
+
+        .main {
+            margin-left: 250px;
+
+            width: calc(100% - 250px);
+
+            min-height: 100vh;
+
+            padding: 28px 34px 30px;
+        }
+
+
+        /* =====================================================
+           TOP HEADER
+        ===================================================== */
+
+        .top-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+
+            margin-bottom: 25px;
+        }
+
+        .eyebrow {
+            color: #368aff;
+
+            font-size: 10px;
+            font-weight: 700;
+
+            letter-spacing: 1.8px;
+
+            margin-bottom: 8px;
+        }
+
+        .top-header h1 {
+            font-size: 27px;
+            line-height: 1.2;
+
+            font-weight: 700;
+
+            color: #ffffff;
+        }
+
+        .subtitle {
+            margin-top: 8px;
+
+            color: #8097b7;
+
+            font-size: 12px;
+        }
+
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .date-display {
+            padding: 10px 14px;
+
+            border: 1px solid rgba(90, 140, 200, 0.20);
+
+            border-radius: 8px;
+
+            color: #9db2cf;
+
+            font-size: 11px;
+
+            background: rgba(10, 28, 52, 0.65);
+        }
+
+        .online {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+
+            padding: 9px 13px;
+
+            border-radius: 20px;
+
+            color: #35e58b;
+
+            font-size: 11px;
+            font-weight: 700;
+
+            border: 1px solid rgba(38, 214, 125, 0.25);
+
+            background: rgba(20, 180, 95, 0.08);
+        }
+
+        .online-dot {
+            width: 7px;
+            height: 7px;
+
+            border-radius: 50%;
+
+            background: #20d477;
+
+            box-shadow:
+                0 0 10px rgba(32, 212, 119, 0.8);
+        }
+
+        .start-btn {
+            height: 42px;
+
+            padding: 0 17px;
+
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            border-radius: 8px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #2675f5,
+                    #1553ca
+                );
+
+            color: #ffffff;
+
+            font-size: 12px;
+            font-weight: 700;
+
+            box-shadow:
+                0 8px 20px rgba(23, 91, 220, 0.25);
+        }
+
+
+        /* =====================================================
+           STAT CARDS
+        ===================================================== */
+
+        .stats-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(4, minmax(0, 1fr));
+
+            gap: 16px;
+
+            margin-bottom: 18px;
+        }
+
+        .stat-card {
+            min-height: 145px;
+
+            padding: 20px;
+
+            border-radius: 12px;
+
+            border: 1px solid rgba(92, 138, 193, 0.18);
+
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(14, 32, 58, 0.96),
+                    rgba(8, 23, 43, 0.96)
+                );
+
+            position: relative;
+
+            overflow: hidden;
+        }
+
+        .stat-card::after {
+            content: "";
+
+            position: absolute;
+
+            width: 120px;
+            height: 120px;
+
+            border-radius: 50%;
+
+            right: -45px;
+            bottom: -55px;
+
+            background: rgba(30, 112, 255, 0.08);
+        }
+
+        .stat-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            position: relative;
+            z-index: 2;
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+
+            border-radius: 50%;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-size: 22px;
+        }
+
+        .blue-icon {
+            background: rgba(30, 110, 255, 0.17);
+            color: #398cff;
+        }
+
+        .green-icon {
+            background: rgba(28, 209, 111, 0.14);
+            color: #2ce889;
+        }
+
+        .red-icon {
+            background: rgba(255, 65, 78, 0.14);
+            color: #ff5260;
+        }
+
+        .purple-icon {
+            background: rgba(140, 71, 255, 0.15);
+            color: #ad72ff;
+        }
+
+        .stat-meta {
+            color: #607a9f;
+
+            font-size: 9px;
+            font-weight: 700;
+
+            letter-spacing: 1px;
+        }
+
+        .stat-label {
+            display: block;
+
+            margin-top: 17px;
+
+            color: #8da4c2;
+
+            font-size: 10px;
+            font-weight: 600;
+
+            letter-spacing: 1.2px;
+        }
+
+        .stat-number {
+            margin-top: 5px;
+
+            font-size: 29px;
+            font-weight: 700;
+
+            color: #ffffff;
+        }
+
+        .stat-desc {
+            margin-top: 3px;
+
+            color: #657f9f;
+
+            font-size: 10px;
+        }
+
+
+        /* =====================================================
+           MAIN DASHBOARD GRID
+        ===================================================== */
+
+        .content-grid {
+            display: grid;
+
+            grid-template-columns:
+                minmax(0, 1.65fr)
+                minmax(320px, 0.85fr);
+
+            gap: 16px;
+
+            margin-bottom: 18px;
+        }
+
+
+        /* =====================================================
+           CARD
+        ===================================================== */
+
+        .card {
+            border-radius: 12px;
+
+            border: 1px solid rgba(92, 138, 193, 0.18);
+
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(12, 29, 53, 0.98),
+                    rgba(7, 20, 38, 0.98)
+                );
+
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 18px 20px;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            border-bottom: 1px solid rgba(92, 138, 193, 0.12);
+        }
+
+        .card-title {
+            font-size: 15px;
+            font-weight: 700;
+
+            color: #ffffff;
+        }
+
+        .card-small {
+            margin-top: 5px;
+
+            color: #6d86a6;
+
+            font-size: 10px;
+        }
+
+        .week-select {
+            padding: 8px 11px;
+
+            border-radius: 7px;
+
+            background: #0c203b;
+
+            border: 1px solid rgba(100, 145, 200, 0.20);
+
+            color: #a9bdd7;
+
+            font-size: 10px;
+        }
+
+
+        /* =====================================================
+           WEEKLY CHART
+        ===================================================== */
+
+        .chart-area {
+            padding: 20px;
+
+            height: 290px;
+
+            position: relative;
+        }
+
+        .chart-grid {
+            position: absolute;
+
+            left: 50px;
+            right: 20px;
+            top: 25px;
+            bottom: 43px;
+
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .grid-line {
+            height: 1px;
+
+            background:
+                rgba(111, 143, 183, 0.12);
+        }
+
+        .y-labels {
+            position: absolute;
+
+            left: 10px;
+            top: 21px;
+            bottom: 39px;
+
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+
+            color: #7188a7;
+
+            font-size: 9px;
+        }
+
+        .chart-svg {
+            position: absolute;
+
+            left: 50px;
+            right: 20px;
+
+            top: 25px;
+            bottom: 42px;
+
+            width: calc(100% - 70px);
+            height: calc(100% - 67px);
+
+            overflow: visible;
+        }
+
+        .chart-labels {
+            position: absolute;
+
+            left: 50px;
+            right: 20px;
+            bottom: 18px;
+
+            display: flex;
+            justify-content: space-between;
+
+            color: #7188a7;
+
+            font-size: 9px;
+        }
+
+        .chart-value {
+            fill: #f3f7ff;
+
+            font-size: 11px;
+
+            font-weight: 700;
+        }
+
+
+        /* =====================================================
+           DONUT
+        ===================================================== */
+
+        .donut-content {
+            min-height: 290px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            gap: 25px;
+
+            padding: 20px;
+        }
+
+        .donut {
+            width: 175px;
+            height: 175px;
+
+            border-radius: 50%;
+
+            background:
+                conic-gradient(
+                    #21c85d 0deg,
+                    #21c85d 0deg,
+                    #ff4754 0deg,
+                    #ff4754 360deg
+                );
+
+            position: relative;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .donut::after {
+            content: "";
+
+            width: 112px;
+            height: 112px;
+
+            position: absolute;
+
+            border-radius: 50%;
+
+            background: #091b32;
+        }
+
+        .donut-center {
+            position: relative;
+            z-index: 2;
+
+            text-align: center;
+        }
+
+        .donut-center strong {
+            display: block;
+
+            font-size: 26px;
+            font-weight: 700;
+        }
+
+        .donut-center span {
+            display: block;
+
+            margin-top: 4px;
+
+            color: #8198b6;
+
+            font-size: 10px;
+        }
+
+        .legend {
+            display: flex;
+            flex-direction: column;
+
+            gap: 20px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: flex-start;
+
+            gap: 10px;
+        }
+
+        .legend-dot {
+            width: 9px;
+            height: 9px;
+
+            border-radius: 50%;
+
+            margin-top: 4px;
+        }
+
+        .present-dot {
+            background: #21c85d;
+        }
+
+        .absent-dot {
+            background: #ff4754;
+        }
+
+        .legend-text strong {
+            display: block;
+
+            font-size: 13px;
+        }
+
+        .legend-text span {
+            display: block;
+
+            margin-top: 3px;
+
+            color: #7189a9;
+
+            font-size: 10px;
+        }
+
+
+        /* =====================================================
+           RECENT + QUICK ACTIONS
+        ===================================================== */
+
+        .bottom-grid {
+            display: grid;
+
+            grid-template-columns:
+                minmax(0, 1.65fr)
+                minmax(320px, 0.85fr);
+
+            gap: 16px;
+
+            margin-bottom: 18px;
+        }
+
+
+        /* TABLE */
+
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+
+            border-collapse: collapse;
+        }
+
+        th {
+            padding: 13px 18px;
+
+            text-align: left;
+
+            color: #657e9f;
+
+            font-size: 9px;
+            font-weight: 700;
+
+            letter-spacing: 0.8px;
+
+            border-bottom:
+                1px solid rgba(100, 140, 190, 0.12);
+        }
+
+        td {
+            padding: 13px 18px;
+
+            color: #c6d3e4;
+
+            font-size: 11px;
+
+            border-bottom:
+                1px solid rgba(100, 140, 190, 0.08);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .student-cell {
+            display: flex;
+            align-items: center;
+
+            gap: 10px;
+        }
+
+        .student-avatar {
+            width: 30px;
+            height: 30px;
+
+            border-radius: 50%;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #1c6be6,
+                    #123c85
+                );
+
+            font-size: 12px;
+        }
+
+        .status-badge {
+            display: inline-flex;
+
+            padding: 5px 9px;
+
+            border-radius: 5px;
+
+            font-size: 9px;
+            font-weight: 700;
+        }
+
+        .status-present {
+            color: #41e78b;
+
+            background: rgba(34, 211, 102, 0.13);
+        }
+
+        .status-absent {
+            color: #ff6570;
+
+            background: rgba(255, 69, 82, 0.13);
+        }
+
+        .empty-row {
+            text-align: center;
+
+            padding: 40px 20px !important;
+
+            color: #7188a5;
+        }
+
+
+        /* QUICK ACTIONS */
+
+        .quick-grid {
+            display: grid;
+
+            grid-template-columns: repeat(2, 1fr);
+
+            gap: 12px;
+
+            padding: 18px;
+        }
+
+        .quick-card {
+            min-height: 115px;
+
+            padding: 18px;
+
+            border-radius: 9px;
+
+            border: 1px solid rgba(90, 140, 200, 0.14);
+
+            background:
+                rgba(12, 31, 56, 0.70);
+
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+
+            text-align: center;
+
+            transition: 0.2s ease;
+        }
+
+        .quick-card:hover {
+            transform: translateY(-2px);
+
+            border-color:
+                rgba(49, 132, 255, 0.40);
+
+            background:
+                rgba(16, 42, 75, 0.9);
+        }
+
+        .quick-icon {
+            width: 42px;
+            height: 42px;
+
+            margin-bottom: 10px;
+
+            border-radius: 9px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background: rgba(38, 119, 255, 0.12);
+
+            color: #398cff;
+
+            font-size: 20px;
+        }
+
+        .quick-card strong {
+            font-size: 11px;
+            color: #eaf1fa;
+        }
+
+        .quick-card span {
+            display: block;
+
+            margin-top: 4px;
+
+            color: #66809f;
+
+            font-size: 9px;
+        }
+
+
+        /* =====================================================
+           SYSTEM INFO
+        ===================================================== */
+
+        .system-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(3, minmax(0, 1fr));
+
+            gap: 14px;
+        }
+
+        .system-card {
+            min-height: 70px;
+
+            padding: 14px 16px;
+
+            border-radius: 9px;
+
+            border: 1px solid rgba(90, 140, 200, 0.14);
+
+            background:
+                rgba(10, 27, 49, 0.75);
+
+            display: flex;
+            align-items: center;
+
+            gap: 12px;
+        }
+
+        .system-icon {
+            width: 36px;
+            height: 36px;
+
+            border-radius: 8px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background: rgba(35, 113, 240, 0.12);
+
+            font-size: 16px;
+        }
+
+        .system-text {
+            flex: 1;
+        }
+
+        .system-text span {
+            display: block;
+
+            color: #5f799b;
+
+            font-size: 8px;
+            font-weight: 700;
+
+            letter-spacing: 1px;
+        }
+
+        .system-text strong {
+            display: block;
+
+            margin-top: 4px;
+
+            color: #d4deec;
+
+            font-size: 10px;
+        }
+
+        .system-badge {
+            color: #39df85;
+
+            font-size: 8px;
+            font-weight: 800;
+        }
+
+
+        /* =====================================================
+           FOOTER
+        ===================================================== */
+
+        .footer {
+            text-align: center;
+
+            margin-top: 25px;
+
+            color: #536c8d;
+
+            font-size: 9px;
+        }
+
+
+        /* =====================================================
+           RESPONSIVE
+        ===================================================== */
+
+        @media (max-width: 1100px) {
+
+            .stats-grid {
+                grid-template-columns:
+                    repeat(2, minmax(0, 1fr));
+            }
+
+            .content-grid,
+            .bottom-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .system-grid {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+
+        @media (max-width: 750px) {
+
+            .sidebar {
+                width: 70px;
+                min-width: 70px;
+            }
+
+            .brand {
+                justify-content: center;
+                padding: 15px 8px;
+            }
+
+            .brand-text,
+            .nav-title,
+            .nav-link span:not(.nav-icon),
+            .sidebar-bottom {
+                display: none;
+            }
+
+            .nav-link {
+                justify-content: center;
+                padding: 0;
+            }
+
+            .main {
+                margin-left: 70px;
+                width: calc(100% - 70px);
+
+                padding: 20px 15px;
+            }
+
+            .top-header {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .header-right {
+                flex-wrap: wrap;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .donut-content {
+                flex-direction: column;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<div class="app">
+
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <aside class="sidebar">
+
+        <div class="brand">
+
+            <div class="brand-icon">
+                📷
+            </div>
+
+            <div class="brand-text">
+
+                <h2>SMART ATTENDANCE</h2>
+
+                <span>
+                    Face Recognition
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <nav class="nav">
+
+            <div class="nav-title">
+                MAIN MENU
+            </div>
+
+
+            <a href="{{ url_for('dashboard') }}"
+               class="nav-link active">
+
+                <span class="nav-icon">⌂</span>
+
+                <span>
+                    Dashboard
+                </span>
+
+            </a>
+
+
+            <a href="{{ url_for('students') }}"
+               class="nav-link">
+
+                <span class="nav-icon">👥</span>
+
+                <span>
+                    Student Management
+                </span>
+
+            </a>
+
+
+            <a href="{{ url_for('attendance') }}"
+               class="nav-link">
+
+                <span class="nav-icon">◉</span>
+
+                <span>
+                    Face Recognition
+                </span>
+
+            </a>
+
+
+            <a href="{{ url_for('reports') }}"
+               class="nav-link">
+
+                <span class="nav-icon">▥</span>
+
+                <span>
+                    Attendance Reports
+                </span>
+
+            </a>
+
+
+            <div class="nav-title"
+                 style="margin-top:28px;">
+
+                ACCOUNT
+
+            </div>
+
+
+            <a href="{{ url_for('logout') }}"
+               class="nav-link logout-link">
+
+                <span class="nav-icon">
+                    ⏻
+                </span>
+
+                <span>
+                    Logout
+                </span>
+
+            </a>
+
+        </nav>
+
+
+        <div class="sidebar-bottom">
+
+            <div class="ai-status">
+
+                <span class="ai-dot"></span>
+
+                AI Face Recognition Online
+
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- =====================================================
+         MAIN
+    ====================================================== -->
+
+    <main class="main">
+
+
+        <!-- HEADER -->
+
+        <header class="top-header">
+
+            <div>
+
+                <div class="eyebrow">
+                    SMART ATTENDANCE SYSTEM
+                </div>
+
+                <h1>
+                    Welcome, Admin 👋
+                </h1>
+
+                <p class="subtitle">
+                    Here's what's happening with attendance today.
+                </p>
+
+            </div>
+
+
+            <div class="header-right">
+
+                <div class="date-display">
+                    📅
+                    <span id="currentDate">
+                        Today
+                    </span>
+                </div>
+
+                <div class="online">
+
+                    <span class="online-dot"></span>
+
+                    System Online
+
+                </div>
+
+                <a href="{{ url_for('attendance') }}"
+                   class="start-btn">
+
+                    📷
+                    Start Attendance
+
+                </a>
+
+            </div>
+
+        </header>
+
+
+        <!-- =====================================================
+             KPI CARDS
+        ====================================================== -->
+
+        <section class="stats-grid">
+
+
+            <!-- TOTAL -->
+
+            <div class="stat-card">
+
+                <div class="stat-top">
+
+                    <div class="stat-icon blue-icon">
+                        👥
+                    </div>
+
+                    <span class="stat-meta">
+                        REGISTERED
+                    </span>
+
+                </div>
+
+                <span class="stat-label">
+                    TOTAL STUDENTS
+                </span>
+
+                <div class="stat-number"
+                     id="totalStudents">
+                    0
+                </div>
+
+                <div class="stat-desc">
+                    Registered Students
+                </div>
+
+            </div>
+
+
+            <!-- PRESENT -->
+
+            <div class="stat-card">
+
+                <div class="stat-top">
+
+                    <div class="stat-icon green-icon">
+                        ✓
+                    </div>
+
+                    <span class="stat-meta">
+                        TODAY
+                    </span>
+
+                </div>
+
+                <span class="stat-label">
+                    PRESENT TODAY
+                </span>
+
+                <div class="stat-number"
+                     id="presentToday">
+                    0
+                </div>
+
+                <div class="stat-desc">
+                    Students present
+                </div>
+
+            </div>
+
+
+            <!-- ABSENT -->
+
+            <div class="stat-card">
+
+                <div class="stat-top">
+
+                    <div class="stat-icon red-icon">
+                        ×
+                    </div>
+
+                    <span class="stat-meta">
+                        TODAY
+                    </span>
+
+                </div>
+
+                <span class="stat-label">
+                    ABSENT TODAY
+                </span>
+
+                <div class="stat-number"
+                     id="absentToday">
+                    0
+                </div>
+
+                <div class="stat-desc">
+                    Students absent
+                </div>
+
+            </div>
+
+
+            <!-- ATTENDANCE -->
+
+            <div class="stat-card">
+
+                <div class="stat-top">
+
+                    <div class="stat-icon purple-icon">
+                        %
+                    </div>
+
+                    <span class="stat-meta">
+                        LIVE
+                    </span>
+
+                </div>
+
+                <span class="stat-label">
+                    ATTENDANCE PERCENTAGE
+                </span>
+
+                <div class="stat-number"
+                     id="attendancePercentage">
+                    0%
+                </div>
+
+                <div class="stat-desc">
+                    Today's Overall
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             CHARTS
+        ====================================================== -->
+
+        <section class="content-grid">
+
+
+            <!-- WEEKLY -->
+
+            <div class="card">
+
+                <div class="card-header">
+
+                    <div>
+
+                        <div class="card-title">
+                            Attendance Overview
+                        </div>
+
+                        <div class="card-small">
+                            Attendance performance this week
+                        </div>
+
+                    </div>
+
+                    <select class="week-select"
+                            id="periodSelect">
+
+                        <option>
+                            This Week
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="chart-area">
+
+                    <div class="y-labels">
+
+                        <span>100%</span>
+                        <span>75%</span>
+                        <span>50%</span>
+                        <span>25%</span>
+                        <span>0%</span>
+
+                    </div>
+
+
+                    <div class="chart-grid">
+
+                        <span class="grid-line"></span>
+                        <span class="grid-line"></span>
+                        <span class="grid-line"></span>
+                        <span class="grid-line"></span>
+                        <span class="grid-line"></span>
+
+                    </div>
+
+
+                    <svg class="chart-svg"
+                         viewBox="0 0 700 200"
+                         preserveAspectRatio="none">
+
+                        <defs>
+
+                            <linearGradient id="chartFill"
+                                            x1="0"
+                                            y1="0"
+                                            x2="0"
+                                            y2="1">
+
+                                <stop offset="0%"
+                                      stop-color="#2178ff"
+                                      stop-opacity="0.30"/>
+
+                                <stop offset="100%"
+                                      stop-color="#2178ff"
+                                      stop-opacity="0.01"/>
+
+                            </linearGradient>
+
+                        </defs>
+
+
+                        <polygon
+                            id="chartAreaFill"
+                            points="0,190 0,190 116,190 233,190 350,190 466,190 583,190 700,190"
+                            fill="url(#chartFill)"
+                        />
+
+
+                        <polyline
+                            id="weeklyLine"
+                            points="0,190 116,190 233,190 350,190 466,190 583,190 700,190"
+                            fill="none"
+                            stroke="#2d82ff"
+                            stroke-width="3"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        />
+
+
+                        <g id="chartPoints"></g>
+
+                    </svg>
+
+
+                    <div class="chart-labels">
+
+                        <span>Mon</span>
+                        <span>Tue</span>
+                        <span>Wed</span>
+                        <span>Thu</span>
+                        <span>Fri</span>
+                        <span>Sat</span>
+                        <span>Sun</span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- DONUT -->
+
+            <div class="card">
+
+                <div class="card-header">
+
+                    <div>
+
+                        <div class="card-title">
+                            Attendance Distribution
+                        </div>
+
+                        <div class="card-small">
+                            Today's attendance
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="donut-content">
+
+                    <div class="donut"
+                         id="attendanceDonut">
+
+                        <div class="donut-center">
+
+                            <strong id="donutTotal">
+                                0
+                            </strong>
+
+                            <span>
+                                Total
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="legend">
+
+                        <div class="legend-item">
+
+                            <span class="legend-dot present-dot"></span>
+
+                            <div class="legend-text">
+
+                                <strong>
+                                    Present
+                                </strong>
+
+                                <span id="legendPresent">
+                                    0 (0%)
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="legend-item">
+
+                            <span class="legend-dot absent-dot"></span>
+
+                            <div class="legend-text">
+
+                                <strong>
+                                    Absent
+                                </strong>
+
+                                <span id="legendAbsent">
+                                    0 (0%)
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             RECENT + QUICK ACTIONS
+        ====================================================== -->
+
+        <section class="bottom-grid">
+
+
+            <!-- RECENT -->
+
+            <div class="card">
+
+                <div class="card-header">
+
+                    <div>
+
+                        <div class="card-title">
+                            Recent Attendance
+                        </div>
+
+                        <div class="card-small">
+                            Latest attendance records
+                        </div>
+
+                    </div>
+
+                    <a href="{{ url_for('history') }}"
+                       class="date-display">
+
+                        View All →
+
+                    </a>
+
+                </div>
+
+
+                <div class="table-wrapper">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    STUDENT
+                                </th>
+
+                                <th>
+                                    ROLL NUMBER
+                                </th>
+
+                                <th>
+                                    TIME
+                                </th>
+
+                                <th>
+                                    STATUS
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody id="recentAttendanceBody">
+
+                            <tr>
+
+                                <td colspan="4"
+                                    class="empty-row">
+
+                                    No attendance records yet.
+
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+
+            <!-- QUICK ACTIONS -->
+
+            <div class="card">
+
+                <div class="card-header">
+
+                    <div>
+
+                        <div class="card-title">
+                            Quick Actions
+                        </div>
+
+                        <div class="card-small">
+                            Manage your attendance system
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="quick-grid">
+
+
+                    <a href="{{ url_for('add_student_page') }}"
+                       class="quick-card">
+
+                        <div class="quick-icon">
+                            👨‍🎓
+                        </div>
+
+                        <strong>
+                            Add New Student
+                        </strong>
+
+                        <span>
+                            Register student
+                        </span>
+
+                    </a>
+
+
+                    <a href="{{ url_for('attendance') }}"
+                       class="quick-card">
+
+                        <div class="quick-icon">
+                            📷
+                        </div>
+
+                        <strong>
+                            Face Recognition
+                        </strong>
+
+                        <span>
+                            Start attendance
+                        </span>
+
+                    </a>
+
+
+                    <a href="{{ url_for('reports') }}"
+                       class="quick-card">
+
+                        <div class="quick-icon">
+                            📄
+                        </div>
+
+                        <strong>
+                            Attendance Reports
+                        </strong>
+
+                        <span>
+                            View reports
+                        </span>
+
+                    </a>
+
+
+                    <button type="button"
+                            class="quick-card"
+                            onclick="exportAttendance()">
+
+                        <div class="quick-icon">
+                            ↓
+                        </div>
+
+                        <strong>
+                            Export Data
+                        </strong>
+
+                        <span>
+                            Download CSV
+                        </span>
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             SYSTEM INFORMATION
+        ====================================================== -->
+
+        <section class="system-grid">
+
+
+            <div class="system-card">
+
+                <div class="system-icon">
+                    🤖
+                </div>
+
+                <div class="system-text">
+
+                    <span>
+                        AI ENGINE
+                    </span>
+
+                    <strong>
+                        Face Recognition Active
+                    </strong>
+
+                </div>
+
+                <div class="system-badge">
+                    ONLINE
+                </div>
+
+            </div>
+
+
+            <div class="system-card">
+
+                <div class="system-icon">
+                    🔐
+                </div>
+
+                <div class="system-text">
+
+                    <span>
+                        SECURITY
+                    </span>
+
+                    <strong>
+                        Attendance System Protected
+                    </strong>
+
+                </div>
+
+                <div class="system-badge">
+                    SECURE
+                </div>
+
+            </div>
+
+
+            <div class="system-card">
+
+                <div class="system-icon">
+                    ⚡
+                </div>
+
+                <div class="system-text">
+
+                    <span>
+                        RECOGNITION
+                    </span>
+
+                    <strong>
+                        Real-Time Processing
+                    </strong>
+
+                </div>
+
+                <div class="system-badge">
+                    READY
+                </div>
+
+            </div>
+
+
+        </section>
+
+
+        <div class="footer">
+
+            © 2026 Smart Attendance System with Face Recognition.
+            All rights reserved.
+
+        </div>
+
+
+    </main>
+
+</div>
+
+
+<script>
+
+    /* =====================================================
+       DATE
+    ===================================================== */
+
+    const dateElement =
+        document.getElementById("currentDate");
+
+    if (dateElement) {
+
+        const now = new Date();
+
+        dateElement.textContent =
+            now.toLocaleDateString(
+                "en-IN",
+                {
+                    day: "numeric",
+                    month: "short",
+                    year: "numeric"
+                }
+            );
+
+    }
+
+
+    /* =====================================================
+       DASHBOARD ELEMENTS
+    ===================================================== */
+
+    const totalElement =
+        document.getElementById("totalStudents");
+
+    const presentElement =
+        document.getElementById("presentToday");
+
+    const absentElement =
+        document.getElementById("absentToday");
+
+    const percentageElement =
+        document.getElementById("attendancePercentage");
+
+    const donut =
+        document.getElementById("attendanceDonut");
+
+    const donutTotal =
+        document.getElementById("donutTotal");
+
+    const legendPresent =
+        document.getElementById("legendPresent");
+
+    const legendAbsent =
+        document.getElementById("legendAbsent");
+
+    const recentBody =
+        document.getElementById("recentAttendanceBody");
+
+
+    /* =====================================================
+       SAFE NUMBER
+    ===================================================== */
+
+    function numberValue(value) {
+
+        const n = Number(value);
+
+        return Number.isFinite(n) ? n : 0;
+
+    }
+
+
+    /* =====================================================
+       UPDATE DASHBOARD
+    ===================================================== */
+
+    function updateDashboard(data) {
+
+        if (!data) {
+            return;
+        }
+
+
+        const stats =
+            data.stats || data;
+
+
+        const total =
+            numberValue(
+                stats.total_students ??
+                stats.totalStudents ??
+                stats.total ??
+                0
+            );
+
+
+        const present =
+            numberValue(
+                stats.present_today ??
+                stats.presentToday ??
+                stats.present ??
+                0
+            );
+
+
+        const absent =
+            numberValue(
+                stats.absent_today ??
+                stats.absentToday ??
+                stats.absent ??
+                Math.max(total - present, 0)
+            );
+
+
+        let percentage =
+            numberValue(
+                stats.attendance_percentage ??
+                stats.attendancePercentage ??
+                stats.attendance_rate ??
+                stats.percentage ??
+                0
+            );
+
+
+        if (
+            percentage === 0 &&
+            total > 0
+        ) {
+
+            percentage =
+                (present / total) * 100;
+
+        }
+
+
+        percentage =
+            Math.max(
+                0,
+                Math.min(
+                    100,
+                    percentage
+                )
+            );
+
+
+        /* KPI */
+
+        if (totalElement)
+            totalElement.textContent =
+                total;
+
+
+        if (presentElement)
+            presentElement.textContent =
+                present;
+
+
+        if (absentElement)
+            absentElement.textContent =
+                absent;
+
+
+        if (percentageElement)
+            percentageElement.textContent =
+                percentage.toFixed(2) + "%";
+
+
+        /* DONUT */
+
+        if (donutTotal)
+            donutTotal.textContent =
+                total;
+
+
+        if (legendPresent)
+            legendPresent.textContent =
+                present +
+                " (" +
+                percentage.toFixed(2) +
+                "%)";
+
+
+        const absentPercentage =
+            total > 0
+                ? (absent / total) * 100
+                : 0;
+
+
+        if (legendAbsent)
+            legendAbsent.textContent =
+                absent +
+                " (" +
+                absentPercentage.toFixed(2) +
+                "%)";
+
+
+        if (donut) {
+
+            const presentAngle =
+                (present / Math.max(total, 1)) * 360;
+
+            donut.style.background =
+                "conic-gradient(" +
+                "#21c85d 0deg " +
+                presentAngle +
+                "deg, " +
+                "#ff4754 " +
+                presentAngle +
+                "deg 360deg)";
+
+        }
+
+
+        /* RECENT */
+
+        renderRecent(
+            data.recent ||
+            data.recent_attendance ||
+            []
+        );
+
+
+        /* WEEKLY */
+
+        renderWeekly(
+            data.weekly ||
+            data.weekly_data ||
+            []
+        );
+
+    }
+
+
+    /* =====================================================
+       RECENT ATTENDANCE
+    ===================================================== */
+
+    function renderRecent(rows) {
+
+        if (!recentBody) {
+            return;
+        }
+
+
+        if (!Array.isArray(rows) ||
+            rows.length === 0) {
+
+            recentBody.innerHTML = `
+
+                <tr>
+
+                    <td colspan="4"
+                        class="empty-row">
+
+                        No attendance records yet.
+
+                    </td>
+
+                </tr>
+
+            `;
+
+            return;
+
+        }
+
+
+        recentBody.innerHTML = "";
+
+
+        rows.slice(0, 5).forEach(
+            function(row) {
+
+                const name =
+                    row.name ||
+                    row.student_name ||
+                    row.studentName ||
+                    "Unknown Student";
+
+
+                const roll =
+                    row.roll_no ||
+                    row.roll_number ||
+                    row.rollNumber ||
+                    "-";
+
+
+                const time =
+                    row.time ||
+                    row.check_in ||
+                    row.checkin_time ||
+                    row.timestamp ||
+                    "-";
+
+
+                const status =
+                    row.status ||
+                    "Present";
+
+
+                const safeStatus =
+                    String(status).toLowerCase();
+
+
+                const statusClass =
+                    safeStatus === "absent"
+                        ? "status-absent"
+                        : "status-present";
+
+
+                const firstLetter =
+                    name.charAt(0).toUpperCase();
+
+
+                const tr =
+                    document.createElement("tr");
+
+
+                tr.innerHTML = `
+
+                    <td>
+
+                        <div class="student-cell">
+
+                            <div class="student-avatar">
+                                ${firstLetter}
+                            </div>
+
+                            <span>
+                                ${escapeHtml(name)}
+                            </span>
+
+                        </div>
+
+                    </td>
+
+                    <td>
+                        ${escapeHtml(String(roll))}
+                    </td>
+
+                    <td>
+                        ${escapeHtml(String(time))}
+                    </td>
+
+                    <td>
+
+                        <span class="status-badge ${statusClass}">
+                            ${escapeHtml(String(status))}
+                        </span>
+
+                    </td>
+
+                `;
+
+
+                recentBody.appendChild(tr);
+
+            }
+        );
+
+    }
+
+
+    /* =====================================================
+       WEEKLY CHART
+    ===================================================== */
+
+    function renderWeekly(rows) {
+
+        if (!Array.isArray(rows) ||
+            rows.length === 0) {
+
+            return;
+
+        }
+
+
+        const values = [];
+
+
+        rows.slice(0, 7).forEach(
+            function(row) {
+
+                const value =
+                    numberValue(
+                        row.percentage ??
+                        row.attendance_percentage ??
+                        row.attendancePercentage ??
+                        row.rate ??
+                        row.present_percentage ??
+                        0
+                    );
+
+                values.push(
+                    Math.max(
+                        0,
+                        Math.min(
+                            100,
+                            value
+                        )
+                    )
+                );
+
+            }
+        );
+
+
+        while (values.length < 7) {
+            values.push(0);
+        }
+
+
+        const points = [];
+
+
+        values.forEach(
+            function(value, index) {
+
+                const x =
+                    (700 / 6) * index;
+
+                const y =
+                    190 -
+                    (value / 100) * 170;
+
+                points.push(
+                    x.toFixed(1) +
+                    "," +
+                    y.toFixed(1)
+                );
+
+            }
+        );
+
+
+        const line =
+            document.getElementById(
+                "weeklyLine"
+            );
+
+
+        const fill =
+            document.getElementById(
+                "chartAreaFill"
+            );
+
+
+        if (line) {
+
+            line.setAttribute(
+                "points",
+                points.join(" ")
+            );
+
+        }
+
+
+        if (fill) {
+
+            fill.setAttribute(
+                "points",
+                "0,190 " +
+                points.join(" ") +
+                " 700,190"
+            );
+
+        }
+
+
+        const pointsGroup =
+            document.getElementById(
+                "chartPoints"
+            );
+
+
+        if (pointsGroup) {
+
+            pointsGroup.innerHTML = "";
+
+
+            values.forEach(
+                function(value, index) {
+
+                    const x =
+                        (700 / 6) * index;
+
+                    const y =
+                        190 -
+                        (value / 100) * 170;
+
+
+                    pointsGroup.innerHTML += `
+
+                        <circle
+                            cx="${x}"
+                            cy="${y}"
+                            r="4"
+                            fill="#2d82ff"
+                            stroke="#061326"
+                            stroke-width="2"
+                        />
+
+                        <text
+                            x="${x}"
+                            y="${Math.max(y - 10, 12)}"
+                            text-anchor="middle"
+                            class="chart-value"
+                        >
+                            ${Math.round(value)}%
+                        </text>
+
+                    `;
+
+                }
+            );
+
+        }
+
+    }
+
+
+    /* =====================================================
+       ESCAPE HTML
+    ===================================================== */
+
+    function escapeHtml(value) {
+
+        return String(value)
+            .replaceAll("&", "&amp;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;")
+            .replaceAll('"', "&quot;")
+            .replaceAll("'", "&#039;");
+
+    }
+
+
+    /* =====================================================
+       EXPORT CSV
+    ===================================================== */
+
+    function exportAttendance() {
+
+        const rows =
+            document.querySelectorAll(
+                "#recentAttendanceBody tr"
+            );
+
+
+        const csv = [
+            [
+                "Student",
+                "Roll Number",
+                "Time",
+                "Status"
+            ]
+        ];
+
+
+        rows.forEach(
+            function(row) {
+
+                const cells =
+                    row.querySelectorAll("td");
+
+
+                if (cells.length !== 4) {
+                    return;
+                }
+
+
+                const values =
+                    Array.from(cells).map(
+                        function(cell) {
+
+                            return cell.innerText
+                                .trim()
+                                .replaceAll(
+                                    '"',
+                                    '""'
+                                );
+
+                        }
+                    );
+
+
+                csv.push(values);
+
+            }
+        );
+
+
+        const csvText =
+            csv.map(
+                function(row) {
+
+                    return row
+                        .map(
+                            function(value) {
+
+                                return '"' +
+                                    value +
+                                    '"';
+
+                            }
+                        )
+                        .join(",");
+
+                }
+            ).join("\n");
+
+
+        const blob =
+            new Blob(
+                [csvText],
+                {
+                    type: "text/csv;charset=utf-8;"
+                }
+            );
+
+
+        const url =
+            URL.createObjectURL(blob);
+
+
+        const link =
+            document.createElement("a");
+
+
+        link.href = url;
+
+        link.download =
+            "attendance_report.csv";
+
+
+        document.body.appendChild(link);
+
+        link.click();
+
+        link.remove();
+
+        URL.revokeObjectURL(url);
+
+    }
+
+
+    /* =====================================================
+       LOAD API
+    ===================================================== */
+
+    async function loadDashboard() {
+
+        try {
+
+            const response =
+                await fetch(
+                    "{{ url_for('dashboard_api') }}",
+                    {
+                        method: "GET",
+                        headers: {
+                            "Accept":
+                                "application/json"
+                        }
+                    }
+                );
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "Dashboard API failed"
+                );
+
+            }
+
+
+            const data =
+                await response.json();
+
+
+            if (data.success !== false) {
+
+                updateDashboard(data);
+
+            }
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "Dashboard loading error:",
+                error
+            );
+
+        }
+
+    }
+
+
+    /* =====================================================
+       START
+    ===================================================== */
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        function() {
+
+            loadDashboard();
+
+            setInterval(
+                loadDashboard,
+                10000
+            );
+
+        }
+    );
+
+</script>
+
+</body>
+
+</html>
